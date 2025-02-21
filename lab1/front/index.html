@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="info">
+        <div id="login-password-container" class="hidden-element">
+            <div>Login</div>
+            <input id="input-login" type="text">
+            <div>Password</div>
+            <input id="input-password" type="text">
+        </div>
+        
+        <div id="name-surname-container" class="hidden-element">
+            <div>Name</div>
+            <input id="input-name" type="text">
+            <div>Surname</div>
+            <input id="input-surname" type="text">
+        </div>
+    </div>
+
+
+    <div id="authorization-container">
+        <button id="button-authorization" onClick="authorization()">Авторизоваться</button>
+        <button id="button-accept-authorization" onClick="acceptAuthorization()" class="hidden-element">Подтвердить авторизацию</button>
+    </div>
+
+    <div id="deleting-container">
+        <button id="button-deleting" onClick="deleting()">Удалить пользователя</button>
+        <button id="button-accept-deleting" onClick="acceptDeleting()" class="hidden-element">Подтвердить удаление</button>
+    </div>
+
+    <div id="add-user-container">
+        <button id="button-adding" onClick="addUser()">Добавить пользователя</button>
+        <button id="button-accept-adding" onClick="acceptAdding()" class="hidden-element">Подтвердить создание пользователя</button>
+    </div>
+
+    <div id="all-users-container">
+        <button id="button-all-users" onClick="getAllUsers()">Список всех пользователей</button>
+        <div id="div-all-users"></div>
+    </div>
+
+    <div id="game-container" class="hidden-element">
+        <div class="grid-container">
+            <div class="grid">
+                <div class="cell" id="cell-0"></div>
+                <div class="cell" id="cell-1"></div>
+                <div class="cell" id="cell-2"></div>
+                <div class="cell" id="cell-3"></div>
+                <div class="cell" id="cell-4"></div>
+                <div class="cell" id="cell-5"></div>
+                <div class="cell" id="cell-6"></div>
+                <div class="cell" id="cell-7"></div>
+                <div class="cell" id="cell-8"></div>
+                <div class="cell" id="cell-9"></div>
+                <div class="cell" id="cell-10"></div>
+                <div class="cell" id="cell-11"></div>
+                <div class="cell" id="cell-12"></div>
+                <div class="cell" id="cell-13"></div>
+                <div class="cell" id="cell-14"></div>
+                <div class="cell" id="cell-15"></div>
+            </div>
+        </div>
+        <div class="score-container">
+            <span id="name"></span>
+            <span id="surname"></span>
+        </div>
+        <div class="score-container">
+            <span id="score">Score: 0</span>
+            <span id="record">Record: 0</span>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>

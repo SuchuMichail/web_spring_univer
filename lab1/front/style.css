@@ -1,0 +1,103 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #faf8ef;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#game-container {
+    text-align: center;
+}
+
+.grid-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    grid-template-rows: repeat(4, 100px);
+    gap: 10px;
+    background-color: #bbada0;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background-color: #ccc0b3;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: #776e65;
+}
+
+.score-container {
+    font-size: 24px;
+    font-weight: bold;
+    color: #776e65;
+}
+
+.cell[data-value="2"] {
+    background-color: #eee4da;
+}
+
+.cell[data-value="4"] {
+    background-color: #ede0c8;
+}
+
+.cell[data-value="8"] {
+    background-color: #f2b179;
+}
+
+.cell[data-value="16"] {
+    background-color: #f59563;
+}
+
+.cell[data-value="32"] {
+    background-color: #f67c5f;
+}
+
+.cell[data-value="64"] {
+    background-color: #f65e3b;
+}
+
+.cell[data-value="128"] {
+    background-color: #edcf72;
+}
+
+.cell[data-value="256"] {
+    background-color: #edcc61;
+}
+
+.cell[data-value="512"] {
+    background-color: #edc850;
+}
+
+.cell[data-value="1024"] {
+    background-color: #edc53f;
+}
+
+.cell[data-value="2048"] {
+    background-color: #edc22e;
+}
+
+
+.hidden-element{
+    display: none;
+}
