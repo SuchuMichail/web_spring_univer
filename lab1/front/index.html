@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="info">
+    <div id="info" class="cellContainer">
         <div id="login-password-container" class="hidden-element">
             <div>Login</div>
             <input id="input-login" type="text">
@@ -24,22 +24,22 @@
     </div>
 
 
-    <div id="authorization-container">
+    <div id="authorization-container" class="cellContainer">
         <button id="button-authorization" onClick="authorization()">Авторизоваться</button>
         <button id="button-accept-authorization" onClick="acceptAuthorization()" class="hidden-element">Подтвердить авторизацию</button>
     </div>
 
-    <div id="deleting-container">
+    <div id="deleting-container" class="cellContainer">
         <button id="button-deleting" onClick="deleting()">Удалить пользователя</button>
         <button id="button-accept-deleting" onClick="acceptDeleting()" class="hidden-element">Подтвердить удаление</button>
     </div>
 
-    <div id="add-user-container">
+    <div id="add-user-container" class="cellContainer">
         <button id="button-adding" onClick="addUser()">Добавить пользователя</button>
         <button id="button-accept-adding" onClick="acceptAdding()" class="hidden-element">Подтвердить создание пользователя</button>
     </div>
 
-    <div id="all-users-container">
+    <div id="all-users-container" class="cellContainer">
         <button id="button-all-users" onClick="getAllUsers()">Список всех пользователей</button>
         <div id="div-all-users"></div>
     </div>
@@ -72,6 +72,11 @@
         <div class="score-container">
             <span id="score">Score: 0</span>
             <span id="record">Record: 0</span>
+        </div>
+
+        <div id="edit-name-container">
+            <button id="button-editing" onClick="editName()">Изменить имя и фамилию</button>
+            <button id="button-accept-editing" class="hidden-element"  onClick="acceptEditingName()">Подтвердить изменение</button>
         </div>
     </div>
     <script src="game.js"></script>

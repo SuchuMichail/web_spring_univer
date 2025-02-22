@@ -8,6 +8,7 @@ let name_surname_container = document.getElementById("name-surname-container");
 let deleting_container = document.getElementById("deleting-container");
 
 
+
 let grid = Array(16).fill(0);
 let score = 0;
 let record = 0;
@@ -47,6 +48,28 @@ function updateBoard() {
         cell.textContent = value === 0 ? '' : value;
         cell.setAttribute('data-value', value);
     });
+
+    if(score > record){
+        record = score;
+        // Сохранить рекорд в бд
+        let obj = {
+            id: id_user,
+            login: login,
+            password: password,
+            name: username,
+            surname: usersurname,
+            score: record
+        };
+
+        console.log(JSON.stringify(obj));
+
+        let req = new XMLHttpRequest();
+        req.open("POST", "http://localhost:8080/user/editUser", false);
+        req.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        req.send(JSON.stringify(obj));
+        console.log(JSON.parse(req.status));
+    }
+
     scoreDisplay.textContent = `Score: ${score}`;
     recordDisplay.textContent = `Record: ${record}`;
     nameDisplay.textContent = `Name: ${username}`;
@@ -84,26 +107,6 @@ function move(direction) {
     }
 
     if (!canMove()) {
-        if(score > record){
-            // Сохранить рекорд в бд
-            let obj = {
-                id: id_user,
-                login: login,
-                password: password,
-                name: username,
-                surname: usersurname,
-                score: score
-            };
-
-            console.log(JSON.stringify(obj));
-
-            let req = new XMLHttpRequest();
-            req.open("POST", "http://localhost:8080/user/editUser", false);
-            req.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            req.send(JSON.stringify(obj));
-            console.log(JSON.parse(req.status));
-        }
-        
         alert("Игра окончена! Нет возможных ходов.");
     }
 }
@@ -338,4 +341,54 @@ function getAllUsers(){
     console.log(req.responseText);
 
     div_all_users.textContent = JSON.stringify(JSON.parse(req.responseText));
+}
+
+
+// Изменение имени и фамилии
+function editName(){
+    let button = document.getElementById("button-editing");
+    button.classList.add('hidden-element');
+
+    let button_accept = document.getElementById("button-accept-editing");
+    button_accept.classList.remove('hidden-element');
+
+    name_surname_container.classList.remove('hidden-element');
+}
+
+function acceptEditingName(){
+    let button = document.getElementById("button-editing");
+    button.classList.remove('hidden-element');
+
+    let button_accept = document.getElementById("button-accept-editing");
+    button_accept.classList.add('hidden-element');
+
+    name_surname_container.classList.add('hidden-element');
+
+    let in_name = document.getElementById("input-name");
+    let in_surname = document.getElementById("input-surname");
+
+    username = in_name.value;
+    usersurname = in_surname.value;
+    nameDisplay.textContent = `Name: ${username}`;
+    surnameDisplay.textContent = `Surname: ${usersurname}`;
+
+    let obj = {
+        id: id_user,
+        login: login,
+        password: password,
+        name: username,
+        surname: usersurname,
+        score: record
+    };
+
+    let req = new XMLHttpRequest();
+    req.open("POST", "http://localhost:8080/user/editUser", false);
+    req.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+    req.send(JSON.stringify(obj));
+    console.log(JSON.parse(req.status));
+
+
+    if(JSON.parse(req.status) < 400){
+        alert("Изменения сохранены");
+    }
 }
