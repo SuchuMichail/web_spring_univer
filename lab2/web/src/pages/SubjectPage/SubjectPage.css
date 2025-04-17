@@ -1,0 +1,76 @@
+.subject-page {
+    padding: 40px 0;
+  }
+  
+  .subject-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  
+  .subject-title {
+    font-size: 2rem;
+    color: var(--primary-color);
+  }
+  
+  .posts-list {
+    margin-top: 30px;
+  }
+  
+  .post-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .post-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .post-author {
+    font-weight: 600;
+    color: var(--dark-color);
+  }
+  
+  .post-date {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .post-text {
+    margin: 15px 0;
+    line-height: 1.7;
+  }
+  
+  .post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+  }
+  
+  .like-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+  }
+  
+  .like-count {
+    font-weight: 600;
+  }
