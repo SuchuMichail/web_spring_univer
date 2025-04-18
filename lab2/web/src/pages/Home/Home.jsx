@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addSubject, deleteSubject } from '../../redux/slices/subjectsSlice';
+import { addSubject, deleteSubject, getSubjects } from '../../redux/slices/subjectsSlice';
 import Subject from '../../components/Subject/Subject';
 import AddSubjectModal from '../../components/AddSubjectModal/AddSubjectModal';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
@@ -14,14 +14,18 @@ const Home = () => {
   const dispatch = useDispatch();
   const { isAdmin } = useSelector(state => state.auth);
   const subjects = useSelector(state => state.subjects.list);
+  const status = useSelector(state => state.subjects.status);
+
+  console.log("SUBJECTSSSSS\n");
+          console.log(subjects);
 
   const handleAddSubject = (subjectName) => {
     dispatch(addSubject(subjectName));
     setShowAddModal(false);
   };
 
-  const handleDeleteClick = (subjectName) => {
-    setSubjectToDelete(subjectName);
+  const handleDeleteClick = (subjectId) => {  // Принимаем только ID
+    setSubjectToDelete(subjectId);
     setShowConfirmModal(true);
   };
 
@@ -30,6 +34,27 @@ const Home = () => {
     setShowConfirmModal(false);
   };
 
+  // Загрузка предметов при монтировании
+  useEffect(() => {
+    const loadSubjects = async () => {
+      try {
+        const result = await dispatch(getSubjects()).unwrap();
+        console.log('Успешно загружено:', result);
+      } catch (err) {
+//        console.error('Ошибка загрузки предметов:', err);
+        console.error('Ошибка загрузки:', {
+          message: err.message,
+          response: err.response?.data
+        });
+      }
+    };
+    loadSubjects();
+  }, [dispatch]);
+  
+  useEffect(() => {
+    console.log('Current subjects:', subjects);
+  }, [subjects]);
+  
   return (
     <div className="home">
       <section className="subjects-section">
@@ -45,14 +70,19 @@ const Home = () => {
           )}
         </div>
         
+
+
         <div className="subjects-grid">
-          {subjects.map((subject, index) => (
-            <Subject 
-              key={index} 
-              name={subject} 
-              onDelete={isAdmin ? () => handleDeleteClick(subject) : null} 
-            />
-          ))}
+          {status === 'loading' ? (
+              <div>Загрузка...</div>
+            ) : ((subjects || []).map((subject) => ( // Защита от undefined
+                <Subject 
+                  key={subject.id} 
+                  subject={subject} 
+                  onDelete={isAdmin ? () => handleDeleteClick(subject.id) : null} 
+                />
+          ))
+        )}
         </div>
       </section>
 

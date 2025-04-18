@@ -42,20 +42,49 @@ export const downloadFile = (postId, fileId) => API.get(`/post/${postId}/files/$
   { responseType: 'blob' }
 );
 
-// Subject endpoints
-export const addSubject = (subjectName) => API.post('/api/subject/addSubject', {subjectName});
-/*
-export const addSubject = (subjectName) => 
-  axios.post('http://localhost:8080/api/subject/addSubject', 
-    { subjectName },
-    { 
-      withCredentials: true,
-      headers: { 'Content-Type': 'application/json' }
-    }
-  );*/
 
-export const getSubjects = () => API.get('/api/subject/getSubjects');
-export const deleteSubject = (subjectId) => API.delete(`/api/subject/deleteSubject/${subjectId}`);
+
+// Subject endpoints
+export const addSubject = (subjectName) => 
+  API.post('/api/subject/addSubject', {subjectName})                                
+      .then(response => {
+        const data = response.data.subjectData; // Извлекаем subjectData;
+        console.log('data: ', data);
+        return data;
+      }); 
+/*
+export const getSubjects = () => API.get('/api/subject/getSubjects')
+                                    .then(response => 
+                                      response.data
+                                    );*/
+export const getSubjects = () => 
+  API.get('/api/subject/getSubjects')
+      .then(response => {
+        if (!response.data) {
+          console.error('Сервер вернул пустые данные');
+          return [];
+        }
+        // Извлекаем subject из каждого элемента массива
+        const subjects = response.data.map(item => item.subject || {});
+        console.log('Нормализованные предметы:', subjects);
+        return subjects;
+      })
+      .catch(error => {
+        console.error('Ошибка при нормализации:', error);
+        throw error; // Важно пробросить ошибку дальше
+      });;
+
+export const deleteSubject = (subjectId) => {
+  if (!subjectId) {
+    console.error('Попытка удаления без ID');
+    return Promise.reject(new Error('ID предмета не указан'));
+  }
+  return API.delete(`/api/subject/deleteSubject/${subjectId}`);
+};
+
+/*API.delete(`/api/subject/deleteSubject/${subjectId}`, { 
+    data: { / здесь параметры для DeleteSubjectRequest / }
+  });*/
 
 // Admin check
 export const checkAdmin = (userId) => API.get(`/user/${userId}/admin`);

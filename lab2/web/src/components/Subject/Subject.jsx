@@ -1,16 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import './Subject.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteSubject } from '../../redux/slices/subjectsSlice';
 
-const Subject = ({ subject }) => { // Получаем subject через пропсы
+const Subject = ({ subject }) => { // Получаем subject через пропсы subject = {id, subjectName}
   const dispatch = useDispatch();
   const { isAdmin } = useSelector(state => state.auth);
   const { status } = useSelector(state => state.subjects);
-
   const subjects = useSelector(state => state.subjects.list);
+
+  if (!subject) return null; // Защита от undefined
+  console.log('Полученные данные:', subject);
+
   console.log(subjects); // Проверьте структуру данных
+
+  console.log("SUBJECT\n")
+  console.log(subject)
+
+  // Проверяем новую структуру
+  const actualSubject = subject.subject || subject;
 
   const handleDelete = async () => {
     if (!isAdmin) {
@@ -18,9 +26,21 @@ const Subject = ({ subject }) => { // Получаем subject через про
       return;
     }
 
-    if (window.confirm(`Удалить предмет "${subject.subjectName}"?`)) {
+    if (!actualSubject?.id) { 
+      console.log("subject: ", subject)
+      console.log(subject.subject.id)
+      console.error('ID предмета не определён:', subject);
+      return;
+    }
+    
+    console.log('Данные предмета перед удалением:', {
+      id: actualSubject.id,
+      name: actualSubject.subjectName
+    });
+
+    if (window.confirm(`Удалить предмет "${actualSubject.subjectName}"?`)) {
       try {
-        await dispatch(deleteSubject(subject.id)).unwrap();
+        await dispatch(deleteSubject(actualSubject.id)).unwrap();
       } catch (err) {
         console.error('Ошибка удаления:', err);
       }
@@ -29,7 +49,7 @@ const Subject = ({ subject }) => { // Получаем subject через про
 
   return (
     <div className="subject-card">
-      <h3>{subject.subjectName}</h3>
+      <h3>{actualSubject?.subjectName || "Название не указано"}</h3>
       {isAdmin && (
         <button 
           onClick={handleDelete}

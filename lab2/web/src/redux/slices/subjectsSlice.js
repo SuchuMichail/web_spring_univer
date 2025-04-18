@@ -10,6 +10,7 @@ export const addSubject = createAsyncThunk(
   async (subjectName, { rejectWithValue }) => {
     try {
       const response = await apiAddSubject(subjectName);
+      console.log('Ответ сервера при добавлении:', response.data);
 
       if (!response) {
         throw new Error('Пустой ответ от сервера');
@@ -30,6 +31,7 @@ export const addSubject = createAsyncThunk(
 export const deleteSubject = createAsyncThunk(
   'subject/deleteSubject',
   async (subjectId, { rejectWithValue }) => {
+    console.log('Пытаемся удалить предмет с ID:', subjectId);
     try {
       await apiDeleteSubject(subjectId); // Отправляем запрос на бэкенд
       return subjectId; // Возвращаем ID для удаления из состояния
@@ -44,8 +46,17 @@ export const getSubjects = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await apiGetSubjects();
-      return response.data;
+
+      console.log("TRY GET SUBJECTS. RESPONSE: ", response)
+      console.log('Формат данных от сервера:', response.data);
+
+      if (!response) {
+        throw new Error('Пустой ответ от сервера');
+      }
+
+      return response; // Возвращаем уже нормализованные данные
     } catch (err) {
+      console.error('Ошибка в getSubjects:', err);
       return rejectWithValue(err.response.data);
     }
   }
@@ -55,14 +66,31 @@ const subjectsSlice = createSlice({
   name: 'subject',
   initialState: {
     list: [],
-    status: 'idle'
+    status: 'idle',
+    error: null
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
+      
+      //addSubject
       .addCase(addSubject.fulfilled, (state, action) => {
-        state.list.push(action.payload);
-        state.status = 'succeeded';
+        //state.list.push(action.payload);
+        if (action.payload) {
+          /*state.list.push({
+            id: action.payload.id,
+            subjectName: action.payload.subjectName
+          });*/
+          state.list.push(action.payload);
+          state.status = 'succeeded';
+        }
+        /*if (action.payload?.subjectData) {
+          state.list.push({
+            id: action.payload.subjectData.id,
+            subjectName: action.payload.subjectData.subjectName
+          });
+          state.status = 'succeeded';
+        }*/
       })
       .addCase(addSubject.rejected, (state, action) => {
         //state.error = action.payload;
@@ -70,6 +98,8 @@ const subjectsSlice = createSlice({
         state.error = action.payload?.message || action.error?.message || 'Ошибка добавления предмета';
       })
 
+
+      //deleteSubject
       .addCase(deleteSubject.fulfilled, (state, action) => {
         // Удаляем предмет из состояния по ID
         state.list = state.list.filter(subject => subject.id !== action.payload);
@@ -78,16 +108,19 @@ const subjectsSlice = createSlice({
         state.error = action.payload;
       })
 
+
+      //getSubjects
       .addCase(getSubjects.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(getSubjects.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload;
+        state.error = action.error.message;
       })
       .addCase(getSubjects.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.list = action.payload;
+        state.list = Array.isArray(action.payload) ? action.payload : [];
+        console.log('Данные в хранилище:', state.list);
       });
   }
   /*reducers: {

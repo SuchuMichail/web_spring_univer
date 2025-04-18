@@ -30,8 +30,8 @@ public class SubjectService {
         return new AddSubjectResponse(saved);
     }
 
-    public void deleteSubject(DeleteSubjectRequest deleteSubjectRequest){
-        subjectRepository.deleteById(deleteSubjectRequest.getId());
+    public void deleteSubject(/*DeleteSubjectRequest deleteSubjectRequest,*/ long id){
+        subjectRepository.deleteById(id);
     }
 
     public List<GetSubjectResponse> getSubjects(){

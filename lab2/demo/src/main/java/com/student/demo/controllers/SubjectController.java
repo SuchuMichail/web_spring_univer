@@ -34,9 +34,12 @@ public class SubjectController {
         return new ResponseEntity<>(subjectService.addSubject(addSubjectRequest), HttpStatus.OK);
     }
 
-    @DeleteMapping("/deleteSubject")
-    public ResponseEntity<?> deleteSubject(@Valid @RequestBody DeleteSubjectRequest deleteSubjectRequest){
-        subjectService.deleteSubject(deleteSubjectRequest);
+    @DeleteMapping("/deleteSubject/{id}")
+    public ResponseEntity<?> deleteSubject(@PathVariable("id") long id/*,
+                                           @Valid @RequestBody DeleteSubjectRequest deleteSubjectRequest*/){
+        subjectService.deleteSubject(/*deleteSubjectRequest, */id);
+
+        System.out.println("TRY TO DELETE " + id);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

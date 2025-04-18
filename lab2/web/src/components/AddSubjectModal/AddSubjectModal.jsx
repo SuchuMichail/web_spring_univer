@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addSubject } from '../../redux/slices/subjectsSlice';
+import { addSubject, getSubjects } from '../../redux/slices/subjectsSlice';
 import './AddSubjectModal.css';
 
 const AddSubjectModal = ({ onClose }) => {
@@ -26,6 +26,11 @@ const AddSubjectModal = ({ onClose }) => {
 
     try {
       await dispatch(addSubject(subjectName)).unwrap();
+
+      // Явно запрашиваем обновленный список
+      await dispatch(getSubjects());
+
+      setSubjectName(''); // Очищаем поле ввода
       onClose(); // Закрываем модалку после успешного добавления
     } catch (err) {
       console.error('Ошибка добавления:', err);
