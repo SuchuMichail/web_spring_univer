@@ -14,7 +14,7 @@ function App() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/subject/:subjectName" element={<SubjectPage />} />
+          <Route path="/subject/:subjectId" element={<SubjectPage />} />
           <Route path="/post/:postId" element={<PostPage />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>

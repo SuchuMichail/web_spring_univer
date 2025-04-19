@@ -113,7 +113,7 @@ const PostPage = () => {
         >
           {isLiked ? '♥' : '♡'} {post.likes}
         </button>
-        <Link to={`/subject/${post.subject}`} className="btn btn-outline">
+        <Link to={`/subject/${post.subject.id}`} className="btn btn-outline">
           Назад к предмету
         </Link>
       </div>

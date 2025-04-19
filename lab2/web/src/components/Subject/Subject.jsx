@@ -2,6 +2,7 @@ import React from 'react';
 import './Subject.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteSubject } from '../../redux/slices/subjectsSlice';
+import { Link } from 'react-router-dom';
 
 const Subject = ({ subject }) => { // Получаем subject через пропсы subject = {id, subjectName}
   const dispatch = useDispatch();
@@ -49,15 +50,18 @@ const Subject = ({ subject }) => { // Получаем subject через про
 
   return (
     <div className="subject-card">
-      <h3>{actualSubject?.subjectName || "Название не указано"}</h3>
-      {isAdmin && (
-        <button 
-          onClick={handleDelete}
-          disabled={status === 'loading'}
-        >
-          {status === 'loading' ? 'Удаление...' : 'Удалить'}
-        </button>
-      )}
+        <Link to={`/subject/${actualSubject.id}`} className="subject-card">
+          <h3>{actualSubject?.subjectName || "Название не указано"}</h3>
+        </Link>
+        {isAdmin && (
+          <button 
+            onClick={handleDelete}
+            disabled={status === 'loading'}
+          >
+            {status === 'loading' ? 'Удаление...' : 'Удалить'}
+          </button>
+        )}
+      
     </div>
   );
 };

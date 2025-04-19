@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPost } from '../../redux/slices/postsSlice';
+import { getSubjects } from '../../redux/slices/subjectsSlice';
 import './CreatePostModal.css';
 
 const CreatePostModal = ({ onClose }) => {
@@ -67,6 +68,14 @@ const CreatePostModal = ({ onClose }) => {
     onClose();
   };
 
+  useEffect(() => {
+    console.log('Subjects data:', subjects); // Проверьте структуру данных
+  }, [subjects]);
+
+  useEffect(() => {
+    dispatch(getSubjects());
+  }, [dispatch]);  
+
   return (
     <div className="modal-overlay">
       <div className="modal-content create-post-modal">
@@ -85,7 +94,12 @@ const CreatePostModal = ({ onClose }) => {
             >
               <option value="">Выберите предмет</option>
               {subjects.map(subject => (
-                <option key={subject} value={subject}>{subject}</option>
+                <option 
+                  key={subject.id} 
+                  value={subject.subjectName}
+                >
+                  {subject.subjectName}
+                </option>
               ))}
             </select>
           </div>

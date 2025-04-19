@@ -1,4 +1,8 @@
 .subject-card {
+  display: block; /* Для корректной работы Link */
+  text-decoration: none; /* Убираем подчёркивание */
+  color: inherit; /* Наследуем цвет текста */
+
     position: relative;
     background: white;
     border-radius: var(--border-radius);
