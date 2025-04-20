@@ -2,119 +2,269 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPost } from '../../redux/slices/postsSlice';
 import { getSubjects } from '../../redux/slices/subjectsSlice';
+import { useNavigate } from 'react-router-dom';
+import { addPost as apiAddPost } from '../../api/api';
 import './CreatePostModal.css';
 
 const CreatePostModal = ({ onClose }) => {
-  const [postData, setPostData] = useState({
-    subject: '',
+  const [formData, setFormData] = useState({
     title: '',
+    subjectId: '',
     text: '',
     files: []
   });
+  
   const [previews, setPreviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  //const [subjectsLoaded, setSubjectsLoaded] = useState(false);
+  
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
-  const subjects = useSelector(state => state.subjects.list);
+  const navigate = useNavigate();
+  ///const subjects = useSelector(state => state.subjects.list);
+  const { list: subjects, status: subjectsStatus } = useSelector(state => state.subjects);
   const { user } = useSelector(state => state.auth);
 
+  // Загрузка предметов при открытии модалки
+  useEffect(() => {
+    if (subjectsStatus === 'idle') {
+      dispatch(getSubjects());
+    }
+  }, [dispatch, subjectsStatus]);
+
+  // Обработчики изменений
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Обработка файлов
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    const newPreviews = files.map(file => ({
+    const newFiles = Array.from(e.target.files);
+    const newPreviews = newFiles.map(file => ({
       name: file.name,
       type: file.type.startsWith('image/') ? 'image' : 'other',
-      url: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+      url: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
+      file
     }));
-    
-    setPostData(prev => ({
-      ...prev,
-      files: [...prev.files, ...files]
-    }));
+
+    setFormData(prev => ({...prev,files: [...prev.files, ...newFiles]}));
     setPreviews(prev => [...prev, ...newPreviews]);
   };
 
   const removeFile = (index) => {
-    const newFiles = [...postData.files];
+    const newFiles = [...formData.files];
     const newPreviews = [...previews];
+    
+    // Освобождаем память от URL превью
+    if (newPreviews[index]?.url) {
+      URL.revokeObjectURL(newPreviews[index].url);
+    }
     
     newFiles.splice(index, 1);
     newPreviews.splice(index, 1);
     
-    setPostData(prev => ({ ...prev, files: newFiles }));
+    setFormData({ ...formData, files: newFiles });
     setPreviews(newPreviews);
   };
+
+  // Очистка превью при закрытии модалки
+  useEffect(() => {
+    return () => {
+      previews.forEach(preview => {
+        if (preview.url) URL.revokeObjectURL(preview.url);
+      });
+    };
+  }, [previews]);
+
+
+
+
+
+  // Отправка формы
+  /*const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('Начало обработки submit'); 
+    
+    if (!formData.subjectId) {
+      setError('Выберите предмет');
+      return;
+    }
+
+    if (!subjectsStatus) {
+      setError('Список предметов еще не загружен');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Находим выбранный предмет
+      const selectedSubject = subjects.find(subj => subj.id == formData.subjectId);
+      if (!selectedSubject) {
+        throw new Error('Выбранный предмет не найден');
+      }
+
+      // Формируем данные для отправки
+      //const postData = {
+      //  title: formData.title,
+     //   text: formData.text,
+     //   subject: selectedSubject,
+     //   author: user,
+     //   files: formData.files
+     // };
+      const formDataToSend = new FormData(); // Используем FormData для multipart
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('text', formData.text);
+
+      
+      formDataToSend.append('subject', JSON.stringify(selectedSubject));
+      formDataToSend.append('author', JSON.stringify(user));
+
+      // Добавляем файлы
+      if (formData.files && formData.files.length > 0) {
+        formData.files.forEach(file => {
+          formDataToSend.append('files', file);
+        });
+      }
+
+      console.log('Отправляемые данные:', formDataToSend);
+      console.log('Отправляемые данные:', {
+        title: formData.title,
+        text: formData.text,
+        subject: selectedSubject,
+        author: user,
+        files: formData.files
+      });
+
+      // Используем метод из api.js
+      const response = await apiAddPost(formDataToSend);
+      console.log('Ответ сервера:', response);
+
+      // Обновляем хранилище Redux
+      dispatch(addPost({
+        ...response.data,
+        //id: response.data.id || Date.now(), // временный ID, если сервер не вернул
+        author: user.username,
+        //subject: subjects.find(subj => subj.id == formData.subjectId).subjectName,
+        subject: selectedSubject.subjectName,
+        likes: 0,
+        likedBy: []
+      }));
+
+      onClose();
+    } catch (err) {
+      console.error('Ошибка создания поста:', err);
+      setError(err.response?.data?.message || 'Ошибка при создании поста');
+    } finally {
+      setIsLoading(false);
+    }
+  };*/
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Здесь должна быть реализация загрузки файлов на сервер
-    // Для примера просто добавляем пост с информацией о файлах
-    const formData = new FormData();
-    postData.files.forEach(file => formData.append('files', file));
-    
-    dispatch(addPost({
-      subject: postData.subject,
-      title: postData.title,
-      text: postData.text,
-      author: user.name,
-      files: postData.files.map(file => ({
-        name: file.name,
-        type: file.type,
-        size: file.size
-      })),
-      likes: 0,
-      likedBy: []
-    }));
-    
-    onClose();
+    if (!formData.subjectId) {
+      setError('Выберите предмет');
+      return;
+    }
+  
+    setIsLoading(true);
+    setError(null);
+  
+    try {
+      // 1. Подготовка данных
+      const selectedSubject = subjects.find(subj => subj.id == formData.subjectId);
+      if (!selectedSubject) {
+        throw new Error('Предмет не найден');
+      }
+  
+      // 2. Формируем FormData
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('text', formData.text);
+      
+      // Важно: отправляем только ID для subject и author
+      formDataToSend.append('subjectId', selectedSubject.id);
+      formDataToSend.append('authorId', user.id);
+  
+      // 3. Добавляем файлы
+      if (formData.files?.length > 0) {
+        formData.files.forEach((file, index) => {
+          formDataToSend.append(`files`, file);
+        });
+      }
+  
+      console.log('Отправляемые данные:');
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(key, value);
+      }
+  
+      // 4. Отправка
+      const response = await apiAddPost(formDataToSend);
+      
+      // 5. Обработка успешного ответа
+      dispatch(addPost({
+        id: response.data.id,
+        title: response.data.title,
+        text: response.data.text,
+        subject: selectedSubject.subjectName,
+        author: user.username,
+        likes: 0,
+        likedBy: []
+      }));
+  
+      onClose();
+    } catch (err) {
+      console.error('Ошибка:', err.response?.data || err.message);
+      setError(err.response?.data?.message || 'Ошибка при создании поста');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  useEffect(() => {
-    console.log('Subjects data:', subjects); // Проверьте структуру данных
-  }, [subjects]);
-
-  useEffect(() => {
-    dispatch(getSubjects());
-  }, [dispatch]);  
-
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal-content create-post-modal">
         <button className="modal-close" onClick={onClose}>×</button>
         <h2 className="modal-title">Создать новый пост</h2>
         
+        {error && <div className="error-message">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <label htmlFor="postSubject">Предмет</label>
+            <label htmlFor="postSubject">Предмет*</label>
             <select
               id="postSubject"
-              name="subject"
-              value={postData.subject}
-              onChange={(e) => setPostData({...postData, subject: e.target.value})}
+              name="subjectId"
+              value={formData.subjectId}
+              onChange={handleInputChange}
               required
+              disabled={subjectsStatus === 'loading'}
             >
               <option value="">Выберите предмет</option>
               {subjects.map(subject => (
-                <option 
-                  key={subject.id} 
-                  value={subject.subjectName}
-                >
+                <option key={subject.id} value={subject.id}>
                   {subject.subjectName}
                 </option>
               ))}
             </select>
+            {subjectsStatus === 'loading' && <div className="loading-indicator">Загрузка предметов...</div>}
           </div>
           
           <div className="input-group">
-          <label htmlFor="postTitle">Название поста</label>
-          <input
-            id="postTitle"
-            type="text"
-            name="title"
-            value={postData.title}
-            onChange={(e) => setPostData({...postData, title: e.target.value})}
-            placeholder="Введите название поста"
-            required
-          />
+            <label htmlFor="postTitle">Название поста*</label>
+            <input
+              id="postTitle"
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              placeholder="Введите название поста"
+              required
+            />
           </div>
 
           <div className="input-group">
@@ -122,17 +272,16 @@ const CreatePostModal = ({ onClose }) => {
             <textarea
               id="postText"
               name="text"
-              value={postData.text}
-              onChange={(e) => setPostData({...postData, text: e.target.value})}
+              value={formData.text}
+              onChange={handleInputChange}
               placeholder="Введите текст вашего поста..."
-              required
+              rows={5}
             />
           </div>
 
           <div className="input-group">
-            <label htmlFor="postFiles">Прикрепленные файлы</label>
+            <label>Прикрепленные файлы</label>
             <input
-              id="postFiles"
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
@@ -175,11 +324,20 @@ const CreatePostModal = ({ onClose }) => {
           </div>
           
           <div className="modal-actions">
-            <button type="button" className="btn btn-outline" onClick={onClose}>
+            <button 
+              type="button" 
+              className="btn btn-outline" 
+              onClick={onClose}
+              disabled={isLoading}
+            >
               Отмена
             </button>
-            <button type="submit" className="btn btn-primary">
-              Опубликовать
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={isLoading || subjectsStatus === 'loading'}
+            >
+              {isLoading ? 'Публикация...' : 'Опубликовать'}
             </button>
           </div>
         </form>

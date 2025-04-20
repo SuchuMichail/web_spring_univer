@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../redux/slices/authSlice';
 import { loginSuccess, registerSuccess } from '../../redux/slices/authSlice';
 import './AuthModal.css';
 
 const AuthModal = ({ onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
-    name: '',
-    password: '',
-    university: '',
-    group: ''
+    login: '',
+    password: ''
   });
   
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
+  const { status, error, user } = useSelector(state => state.auth);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -22,116 +24,77 @@ const AuthModal = ({ onClose }) => {
     }));
   };
 
+   // Добавляем эффект для перенаправления после успешного входа
+   useEffect(() => {
+    if (user) {
+      onClose(); // Закрываем модальное окно
+      navigate('/profile'); // Перенаправляем в личный кабинет
+    }
+  }, [user, navigate, onClose]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    if (isLogin) {
-      dispatch(loginSuccess({
-        name: formData.name,
-        password: formData.password
-      }));
-    } else {
-      dispatch(registerSuccess({
-        name: formData.name,
-        university: formData.university,
-        group: formData.group,
-        password: formData.password
-      }));
-    }
-    
-    onClose();
+    dispatch(login({
+      login: formData.login, // Отправляем login
+      password: formData.password
+    }));
   };
-
+  
   return (
     <div className="auth-modal-overlay">
       <div className="auth-modal-container">
-        <button 
-          className="auth-modal-close-btn"
-          onClick={onClose}
-          aria-label="Закрыть окно"
-        >
-          <span className="auth-modal-close-icon">×</span>
-        </button>
+        <button className="auth-modal-close-btn" onClick={onClose}>×</button>
+        <h2>{isLogin ? 'Вход в систему' : 'Регистрация'}</h2>
+        
+        {error && (
+          <div className="auth-error">
+            {error}
+          </div>
+        )}
 
-        <h2 className="auth-modal-title">
-          {isLogin ? 'Вход в аккаунт' : 'Регистрация'}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="auth-modal-form">
-          <div className="auth-input-group">
-            <label htmlFor="auth-name">Логин</label>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Логин</label>
             <input
-              id="auth-name"
               type="text"
-              name="name"
-              value={formData.name}
+              name="login"
+              value={formData.login}
               onChange={handleChange}
               required
-              autoComplete="username"
             />
           </div>
-
-          <div className="auth-input-group">
-            <label htmlFor="auth-password">Пароль</label>
+          
+          <div className="form-group">
+            <label>Пароль</label>
             <input
-              id="auth-password"
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              autoComplete={isLogin ? "current-password" : "new-password"}
             />
           </div>
+          
+          <button 
+            type="submit" 
+            disabled={status === 'loading'}
+            className="login-btn"
+          >
+            {status === 'loading' ? (isLogin ? 'Вход...' : 'Регистрация...') : (isLogin ? 'Войти' : 'Зарегистрироваться')}
+          </button>
 
-          {!isLogin && (
-            <>
-              <div className="auth-input-group">
-                <label htmlFor="auth-university">Университет</label>
-                <input
-                  id="auth-university"
-                  type="text"
-                  name="university"
-                  value={formData.university}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <div className="auth-input-group">
-                <label htmlFor="auth-group">Группа</label>
-                <input
-                  id="auth-group"
-                  type="text"
-                  name="group"
-                  value={formData.group}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </>
-          )}
-
-          <div className="auth-modal-actions">
-            <button 
-              type="submit" 
-              className="auth-modal-submit-btn"
-            >
-              {isLogin ? 'Войти' : 'Зарегистрироваться'}
-            </button>
-
-            <button
-              type="button"
-              className="auth-modal-switch-btn"
-              onClick={() => setIsLogin(!isLogin)}
-            >
-              {isLogin ? 'Создать новый аккаунт' : 'Уже есть аккаунт? Войти'}
-            </button>
-          </div>
+          <button
+            type="button"
+            className="switch-mode-btn"
+            onClick={() => setIsLogin(!isLogin)}
+          >
+            {isLogin ? 'Создать новый аккаунт' : 'Уже есть аккаунт? Войти'}
+          </button>
         </form>
       </div>
     </div>
   );
+
 };
 
 export default AuthModal;

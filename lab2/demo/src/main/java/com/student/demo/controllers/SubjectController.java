@@ -1,7 +1,6 @@
 package com.student.demo.controllers;
 
 import com.student.demo.requests.subject.AddSubjectRequest;
-import com.student.demo.requests.subject.DeleteSubjectRequest;
 import com.student.demo.services.SubjectService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +22,13 @@ public class SubjectController {
     }
 
     @PostMapping("/addSubject")
-    public ResponseEntity<?> addSubject(@Valid @RequestBody AddSubjectRequest addSubjectRequest/*,
-                                        @RequestHeader(value = "Authorization", required = false) String authHeader*/) throws IOException {
-        // Проверка авторизации и прав администратора
-        /*if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }*/
-
-        System.out.println("ARARA");
+    public ResponseEntity<?> addSubject(@Valid @RequestBody AddSubjectRequest addSubjectRequest) throws IOException {
         return new ResponseEntity<>(subjectService.addSubject(addSubjectRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteSubject/{id}")
-    public ResponseEntity<?> deleteSubject(@PathVariable("id") long id/*,
-                                           @Valid @RequestBody DeleteSubjectRequest deleteSubjectRequest*/){
-        subjectService.deleteSubject(/*deleteSubjectRequest, */id);
+    public ResponseEntity<?> deleteSubject(@PathVariable("id") long id){
+        subjectService.deleteSubject(id);
 
         System.out.println("TRY TO DELETE " + id);
 

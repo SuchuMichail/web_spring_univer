@@ -3,9 +3,8 @@ package com.student.demo.services;
 import com.student.demo.entities.SubjectData;
 import com.student.demo.repositories.ISubjectRepository;
 import com.student.demo.requests.subject.AddSubjectRequest;
-import com.student.demo.requests.subject.DeleteSubjectRequest;
-import com.student.demo.responses.AddSubjectResponse;
-import com.student.demo.responses.GetSubjectResponse;
+import com.student.demo.responses.subject.AddSubjectResponse;
+import com.student.demo.responses.subject.GetSubjectResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

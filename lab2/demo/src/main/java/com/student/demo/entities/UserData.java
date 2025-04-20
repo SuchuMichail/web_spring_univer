@@ -20,10 +20,14 @@ public class UserData {
     private String login;
     @Column(name = "password")
     private String password;
+    @Column(name = "username")
+    private String username;
     @Column(name = "university")
     private String university;
     @Column(name = "userGroup")
     private String userGroup;
+    @Column(name = "isAdmin")
+    private boolean isAdmin;
 
     @OneToMany
     @JoinColumn(name = "user_id")
@@ -35,21 +39,47 @@ public class UserData {
                 inverseJoinColumns = @JoinColumn(name = "postData_id"))
     private List<PostData> likedPosts = new ArrayList<>();
 
-    public UserData(Long id, String login, String password, String university, String userGroup) {
+    public UserData(Long id, String login, String password, String username, String university, String userGroup, boolean isAdmin) {
         this.id = id;
         this.login = login;
         this.password = password;
+        this.username = username;
         this.university = university;
         this.userGroup = userGroup;
+        this.isAdmin = isAdmin;
     }
 
-    public UserData(Long id, String login, String password, String university, String userGroup, List<PostData> userPosts, List<PostData> likedPosts) {
+    public UserData(Long id, String login, String password, String username, String university, String userGroup) {
         this.id = id;
         this.login = login;
         this.password = password;
+        this.username = username;
+        this.university = university;
+        this.userGroup = userGroup;
+        this.isAdmin = false;
+    }
+
+    public UserData(Long id, String login, String password, String username, String university, String userGroup, boolean isAdmin, List<PostData> userPosts, List<PostData> likedPosts) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.username = username;
+        this.university = university;
+        this.userGroup = userGroup;
+        this.isAdmin = isAdmin;
+        this.userPosts = userPosts;
+        this.likedPosts = likedPosts;
+    }
+
+    public UserData(Long id, String login, String password, String username, String university, String userGroup, List<PostData> userPosts, List<PostData> likedPosts) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.username = username;
         this.university = university;
         this.userGroup = userGroup;
         this.userPosts = userPosts;
         this.likedPosts = likedPosts;
+        this.isAdmin = false;
     }
 }

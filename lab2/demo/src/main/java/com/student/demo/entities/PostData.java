@@ -17,9 +17,15 @@ public class PostData {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Lob
-    @Column(name = "document", columnDefinition = "BLOB")
-    private byte[] document;
+    @Column(name = "title")
+    private String title;
+
+    @Column(name="text")
+    private String text;
+
+    @OneToMany
+    @JoinColumn(name = "post_id")
+    private List<PostFile> postFiles = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "subject_id", referencedColumnName = "id")
@@ -27,26 +33,22 @@ public class PostData {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private UserData userData;
+    private UserData author;
 
     @ManyToMany
     @JoinTable(name = "student_likedpost",
             joinColumns = @JoinColumn(name = "postData_id"),
             inverseJoinColumns = @JoinColumn(name = "userData_id"))
-    private List<UserData> likedUsers = new ArrayList<>();
+    private List<UserData> likedBy = new ArrayList<>();
 
-    public PostData(Long id, byte[] document, SubjectData subject, UserData userData) {
-        this.id = id;
-        this.document = document;
-        this.subject = subject;
-        this.userData = userData;
-    }
 
-    public PostData(Long id, byte[] document, SubjectData subject, UserData userData, List<UserData> likedUsers) {
+    public PostData(Long id, String title, String text, List<PostFile> postFiles, SubjectData subject, UserData author, List<UserData> likedBy) {
         this.id = id;
-        this.document = document;
+        this.title = title;
+        this.text = text;
+        this.postFiles = postFiles;
         this.subject = subject;
-        this.userData = userData;
-        this.likedUsers = likedUsers;
+        this.author = author;
+        this.likedBy = likedBy;
     }
 }

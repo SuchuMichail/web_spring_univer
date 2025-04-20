@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../redux/slices/authSlice';
+import { fetchUserPosts } from '../../redux/slices/postsSlice';
 import Post from '../../components/Post/Post';
 import CreatePostModal from '../../components/CreatePostModal/CreatePostModal';
 import AuthModal from '../../components/AuthModal/AuthModal';
@@ -13,16 +14,27 @@ const Profile = () => {
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isAdmin } = useSelector(state => state.auth);
+  const { user } = useSelector(state => state.auth);
   const posts = useSelector(state => state.posts.items);
   
-  const userPosts = user ? posts.filter(post => post.author === user.name) : [];
-  const likedPosts = user ? posts.filter(post => post.likedBy?.includes(user.name)) : [];
+  //const userPosts = user ? posts.filter(post => post.author === user.id) : [];
+  //const likedPosts = user ? posts.filter(post => post.likedBy?.includes(user.id)) : [];
+
+  const userPosts = user?.userPosts || [];
+  const likedPosts = user?.likedPosts || [];
+
+  console.log("user = ", user)
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/');
   };
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchUserPosts(user.id));
+    }
+  }, [dispatch, user]);
 
   if (showAuthModal) {
     return <AuthModal onClose={() => setShowAuthModal(false)} />;
@@ -46,6 +58,8 @@ const Profile = () => {
     );
   }
 
+  
+
   return (
     <div className="profile">
       <div className="container">
@@ -57,10 +71,10 @@ const Profile = () => {
         <div className="user-info">
           <div className="info-card">
             <h2 className="info-title">Основная информация</h2>
-            <p><span className="info-label">Имя:</span> {user.name}</p>
+            <p><span className="info-label">Имя:</span> {user.username || user.login}</p>
             <p><span className="info-label">Университет:</span> {user.university || 'Не указан'}</p>
-            <p><span className="info-label">Группа:</span> {user.group || 'Не указана'}</p>
-            {isAdmin && <p className="admin-badge">Администратор</p>}
+            <p><span className="info-label">Группа:</span> {user.userGroup || 'Не указана'}</p>
+            {user.isAdmin && <p className="admin-badge">Администратор</p>}
           </div>
         </div>
 

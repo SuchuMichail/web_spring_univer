@@ -1,4 +1,4 @@
-package com.student.demo.responses;
+package com.student.demo.responses.user;
 
 import com.student.demo.entities.UserData;
 import lombok.Data;

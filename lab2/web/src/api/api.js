@@ -8,6 +8,14 @@ const API = axios.create({
   }
 });
 
+const fileAPI = axios.create({
+  baseURL: 'http://localhost:8080',
+  withCredentials: true, // Для отправки кук/сессий
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  }
+});
+
 // Добавьте обработку CORS ошибок
 API.interceptors.response.use(
   response => {
@@ -31,12 +39,37 @@ API.interceptors.response.use(
 
 // User endpoints
 export const registerUser = (userData) => API.post('/user/register', userData);
-export const loginUser = (credentials) => API.post('/user/login', credentials);
 export const deleteUser = (userId) => API.delete(`/user/${userId}`);
 
+export const loginUser = (credentials) => 
+  API.post('/api/user/login', credentials)
+    .then(response => {
+      console.log('Полный ответ сервера:', response);
+      console.log("userData ",response.data.userData)
+      // Если сервер возвращает null при неудачной аутентификации
+      if (response.data === null) {
+        throw new Error('Неверный логин или пароль');
+      }
+      if (!response.data?.userData) { // Проверяем наличие userData
+        throw new Error('Неверный логин или пароль');
+      }
+      return response.data.userData;
+    })
+    .catch(error => {
+      console.error('Ошибка входа:', error);
+      if (error.response && error.response.status === 401) {
+        throw new Error('Неверный логин или пароль');
+      }
+      throw error;
+    });
+
+
+
 // Post endpoints
-export const createPost = (postData) => API.post('/post', postData);
-export const getPosts = () => API.get('/post');
+export const addPost = (formData) => fileAPI.post('/api/post/addPost', formData);
+
+
+export const fetchUserPosts = (userId) => API.get(`/api/user/${userId}/getPosts`);
 export const deletePost = (postId) => API.delete(`/post/${postId}`);
 export const downloadFile = (postId, fileId) => API.get(`/post/${postId}/files/${fileId}`, 
   { responseType: 'blob' }
@@ -52,11 +85,7 @@ export const addSubject = (subjectName) =>
         console.log('data: ', data);
         return data;
       }); 
-/*
-export const getSubjects = () => API.get('/api/subject/getSubjects')
-                                    .then(response => 
-                                      response.data
-                                    );*/
+
 export const getSubjects = () => 
   API.get('/api/subject/getSubjects')
       .then(response => {
@@ -82,9 +111,6 @@ export const deleteSubject = (subjectId) => {
   return API.delete(`/api/subject/deleteSubject/${subjectId}`);
 };
 
-/*API.delete(`/api/subject/deleteSubject/${subjectId}`, { 
-    data: { / здесь параметры для DeleteSubjectRequest / }
-  });*/
 
 // Admin check
 export const checkAdmin = (userId) => API.get(`/user/${userId}/admin`);
