@@ -31,6 +31,8 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    console.log("RENDERRRRRRRRRRR\n",user)
+
     if (user?.id) {
       dispatch(fetchUserPosts(user.id));
     }

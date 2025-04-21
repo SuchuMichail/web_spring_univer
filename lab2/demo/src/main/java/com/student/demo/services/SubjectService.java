@@ -3,8 +3,7 @@ package com.student.demo.services;
 import com.student.demo.entities.SubjectData;
 import com.student.demo.repositories.ISubjectRepository;
 import com.student.demo.requests.subject.AddSubjectRequest;
-import com.student.demo.responses.subject.AddSubjectResponse;
-import com.student.demo.responses.subject.GetSubjectResponse;
+import com.student.demo.responses.subject.SubjectWithPostsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,7 @@ public class SubjectService {
     @Autowired
     private ISubjectRepository subjectRepository;
 
-    public AddSubjectResponse addSubject(AddSubjectRequest addSubjectRequest) throws IOException {
+    public SubjectWithPostsDTO addSubject(AddSubjectRequest addSubjectRequest) throws IOException {
         SubjectData subject = new SubjectData(
                 null,
                 addSubjectRequest.getSubjectName());
@@ -26,19 +25,19 @@ public class SubjectService {
 
         System.out.println("ID = " + saved.getId());
 
-        return new AddSubjectResponse(saved);
+        return new SubjectWithPostsDTO(saved);
     }
 
     public void deleteSubject(/*DeleteSubjectRequest deleteSubjectRequest,*/ long id){
         subjectRepository.deleteById(id);
     }
 
-    public List<GetSubjectResponse> getSubjects(){
+    public List<SubjectWithPostsDTO> getSubjects(){
         List<SubjectData> subjectList = subjectRepository.getSubjects();
 
-        List<GetSubjectResponse> result = new ArrayList<>(subjectList.size());
+        List<SubjectWithPostsDTO> result = new ArrayList<>(subjectList.size());
         for(SubjectData subject : subjectList){
-            result.add(new GetSubjectResponse(subject));
+            result.add(new SubjectWithPostsDTO(subject));
         }
 
         return result;

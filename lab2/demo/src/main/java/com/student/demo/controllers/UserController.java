@@ -35,6 +35,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginPasswordRequest loginPasswordRequest){
+        System.out.println("AAAAAAAAAAAAAAAAAA\n" + userService.getUserByLP(loginPasswordRequest));
         return new ResponseEntity<>(userService.getUserByLP(loginPasswordRequest), HttpStatus.OK);
     }
 

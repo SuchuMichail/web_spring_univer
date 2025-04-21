@@ -6,19 +6,20 @@ import com.student.demo.responses.post.PostDTO;
 import lombok.Data;
 
 import java.beans.ConstructorProperties;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class UserWithPostsDTO {
     private UserDTO user;
-    private List<PostDTO> userPosts;
-    private List<PostDTO> likedByPosts;
+    private List<PostDTO> userPosts = new ArrayList<>();
+    private List<PostDTO> likedPosts = new ArrayList<>();
 
-    @ConstructorProperties({"user", "userPosts", "likedByPosts"})
+    @ConstructorProperties({"user", "userPosts", "likedPosts"})
     public UserWithPostsDTO(UserDTO user, List<PostDTO> userPosts, List<PostDTO> likedByPosts) {
         this.user = user;
         this.userPosts = userPosts;
-        this.likedByPosts = likedByPosts;
+        this.likedPosts = likedByPosts;
     }
 
     public UserWithPostsDTO(UserData userData){
@@ -28,7 +29,7 @@ public class UserWithPostsDTO {
                 this.userPosts.add(new PostDTO(postData));
             }
             for (PostData postData : userData.getLikedPosts()) {
-                this.likedByPosts.add(new PostDTO(postData));
+                this.likedPosts.add(new PostDTO(postData));
             }
         }
     }

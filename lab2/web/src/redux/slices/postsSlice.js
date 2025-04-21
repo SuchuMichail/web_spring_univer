@@ -27,12 +27,13 @@ export const fetchUserPosts = createAsyncThunk(
 );
 
 const postsSlice = createSlice({
-  name: 'posts',
+  name: 'post',
   initialState: {
     items: [],
     status: 'idle',
     error: null,
     userPosts: [], // Отдельное поле для постов пользователя
+    likedBy: []
   },
   reducers: {
     // Синхронные редьюсеры
@@ -85,6 +86,13 @@ const postsSlice = createSlice({
       .addCase(fetchUserPosts.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.userPosts = action.payload;
+
+        // Добавьте посты в общий список
+        action.payload.forEach(post => {
+          if (!state.items.some(p => p.id === post.id)) {
+            state.items.push(post);
+          }
+        });
       })
       .addCase(fetchUserPosts.rejected, (state, action) => {
         state.status = 'failed';

@@ -6,14 +6,14 @@ import com.student.demo.repositories.IPostFileRepository;
 import com.student.demo.repositories.IPostRepository;
 import com.student.demo.requests.post.AddPostRequest;
 import com.student.demo.requests.post.DeletePostRequest;
-import com.student.demo.responses.post.AddPostResponse;
+import com.student.demo.responses.post.FullPostDTO;
+import com.student.demo.responses.post.PostWithFilesAndLikedByDTO;
+import com.student.demo.responses.post.PostWithFilesDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 @Service
 public class PostService {
@@ -22,7 +22,7 @@ public class PostService {
     @Autowired
     private IPostFileRepository postFileRepository;
 
-    public AddPostResponse addPost(AddPostRequest addPostRequest) throws IOException {
+    public FullPostDTO addPost(AddPostRequest addPostRequest) throws IOException {
         PostData post = new PostData();
         post.setTitle(addPostRequest.getTitle());
         post.setText(addPostRequest.getText());
@@ -44,7 +44,11 @@ public class PostService {
             }
         }
 
-        return new AddPostResponse(savedPost);
+        return new FullPostDTO(savedPost);
+    }
+
+    public FullPostDTO fetchPostById(long id){
+        return new FullPostDTO(postRepository.findById(id).orElseThrow(IllegalArgumentException::new));
     }
 
     public void deletePost(DeletePostRequest deletePostRequest){

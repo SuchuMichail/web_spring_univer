@@ -41,19 +41,21 @@ API.interceptors.response.use(
 export const registerUser = (userData) => API.post('/user/register', userData);
 export const deleteUser = (userId) => API.delete(`/user/${userId}`);
 
+export const fetchUserPosts = (userId) => API.get(`/api/user/${userId}/getPosts`);
+
 export const loginUser = (credentials) => 
   API.post('/api/user/login', credentials)
     .then(response => {
       console.log('Полный ответ сервера:', response);
-      console.log("userData ",response.data.userData)
+      console.log("userData ",response.data.user)
       // Если сервер возвращает null при неудачной аутентификации
       if (response.data === null) {
         throw new Error('Неверный логин или пароль');
       }
-      if (!response.data?.userData) { // Проверяем наличие userData
+      if (!response.data?.user) { // Проверяем наличие userData
         throw new Error('Неверный логин или пароль');
       }
-      return response.data.userData;
+      return response.data;
     })
     .catch(error => {
       console.error('Ошибка входа:', error);
@@ -69,7 +71,9 @@ export const loginUser = (credentials) =>
 export const addPost = (formData) => fileAPI.post('/api/post/addPost', formData);
 
 
-export const fetchUserPosts = (userId) => API.get(`/api/user/${userId}/getPosts`);
+export const fetchPostById = (postId) => API.get(`/api/post/${postId}`)
+    .then(response => response.data);
+
 export const deletePost = (postId) => API.delete(`/post/${postId}`);
 export const downloadFile = (postId, fileId) => API.get(`/post/${postId}/files/${fileId}`, 
   { responseType: 'blob' }

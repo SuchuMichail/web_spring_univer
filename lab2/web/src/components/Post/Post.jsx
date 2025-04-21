@@ -7,17 +7,21 @@ import './Post.css';
 const Post = ({ post }) => {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
-  const isLiked = user && post.likedBy.includes(user.name);
+  const isLiked = user && post.likedBy && post.likedBy.includes(user.id || user.name);
 
   const handleLike = (e) => {
     e.preventDefault();
     if (user) {
       dispatch(toggleLike({
         postId: post.id,
-        userId: user.name
+        userId: user.id
       }));
     }
   };
+
+  console.log('Post data:', post);
+console.log('LikedBy:', post.likedBy);
+console.log('User:', user);
 
   return (
     <Link to={`/post/${post.id}`} className="post-card">

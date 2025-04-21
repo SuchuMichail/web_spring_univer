@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleLike } from '../../redux/slices/postsSlice';
-import { downloadFile } from '../../api/api';
+import { toggleLike, addPost } from '../../redux/slices/postsSlice';
+import { downloadFile, fetchPostById, fetchUserPosts  } from '../../api/api';
 import './PostPage.css';
 
 const PostPage = () => {
@@ -10,10 +10,40 @@ const PostPage = () => {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
   const post = useSelector(state => 
-    state.posts.items.find(p => p.id === parseInt(postId))
+    state.posts.items.find(p => String(p.id) === String(postId))
   );
+
+  console.log("POST = \n",post)
+
   const [downloadingFile, setDownloadingFile] = useState(null);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchUserPosts(user.id)); // Загружаем посты пользователя
+    }
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    if (!post && postId) {
+      const loadPost = async () => {
+        try {
+          const response = await fetchPostById(postId); // Используем fetchPostById
+          const normalizedPost = {
+            ...response.post,
+            subject: response.post.subject || null,
+            author: response.post.author,
+            files: response.files || [],
+            likedBy: response.likedBy || []
+          };
+          dispatch(addPost(normalizedPost)); // Сохраняем пост в Redux
+        } catch (err) {
+          console.error('Ошибка загрузки поста:', err);
+        }
+      };
+      loadPost();
+    }
+  }, [postId, post, dispatch]);
 
   if (!post) {
     return (
@@ -64,6 +94,8 @@ const PostPage = () => {
     }
   };
 
+  
+
   return (
     <div className="post-page">
       <div className="post-header">
@@ -113,7 +145,7 @@ const PostPage = () => {
         >
           {isLiked ? '♥' : '♡'} {post.likes}
         </button>
-        <Link to={`/subject/${post.subject.id}`} className="btn btn-outline">
+        <Link to={post.subject ? `/subject/${post.subject.id}` : '#'} className="btn btn-outline">
           Назад к предмету
         </Link>
       </div>

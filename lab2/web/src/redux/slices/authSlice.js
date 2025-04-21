@@ -6,25 +6,27 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const userData  = await loginUser(credentials);
+      console.log("SDFBSFBSFBSFGBFGNFDNDFNDGNGHDNGHD")
+      const responseData  = await loginUser(credentials);
       //const userData = response.data?.userData; // Достаем userData из ответа
-      console.log("userData : ", userData)
-      if (!userData) {
+      console.log("IMINSLICEEEEEEEEEEE\nresponseData : ", responseData)
+      
+      if (!responseData) {
         return rejectWithValue('Неверный логин или пароль');
       }
       return {
         user: {
-          id: userData.id,
-          login: userData.login,
-          password: userData.password,
-          username: userData.username,
-          university: userData.university,
-          userGroup: userData.userGroup, // Используем userGroup
-          isAdmin: userData.admin, // Используем поле isAdmin из UserData
-          likedPosts: userData.likedPosts || [], // Добавляем likedPosts
-          userPosts: userData.userPosts || [] // Добавляем userPosts
+          id: responseData.user.id,
+          login: responseData.user.login,
+          password: responseData.user.password,
+          username: responseData.user.username,
+          university: responseData.user.university,
+          userGroup: responseData.user.userGroup, // Используем userGroup
+          isAdmin: responseData.user.admin, // Используем поле isAdmin из UserData
+          likedPosts: responseData.likedPosts || [], // Добавляем likedPosts
+          userPosts: responseData.userPosts || [] // Добавляем userPosts
         },
-        isAdmin: userData.admin // Дублируем для удобства
+        isAdmin: responseData.user.admin // Дублируем для удобства
       };
     } catch (error) {
       return rejectWithValue(error.message);

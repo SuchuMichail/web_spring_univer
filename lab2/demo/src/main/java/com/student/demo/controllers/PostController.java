@@ -24,12 +24,10 @@ import java.util.List;
 public class PostController {
     @Autowired
     private final PostService postService;
-
     @Autowired
     private IUserRepository userRepository;
     @Autowired
     private ISubjectRepository subjectRepository;
-
 
 
     public PostController(PostService postService) {
@@ -58,5 +56,10 @@ public class PostController {
         postService.deletePost(deletePostRequest);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> fetchPostById(@PathVariable("id") long id){
+        return new ResponseEntity<>(postService.fetchPostById(id), HttpStatus.OK);
     }
 }
