@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addPost } from '../../redux/slices/postsSlice';
+import { addPost, fetchUserPosts } from '../../redux/slices/postsSlice';
 import { getSubjects } from '../../redux/slices/subjectsSlice';
 import { useNavigate } from 'react-router-dom';
 import { addPost as apiAddPost } from '../../api/api';
@@ -210,11 +210,14 @@ const CreatePostModal = ({ onClose }) => {
         id: response.data.id,
         title: response.data.title,
         text: response.data.text,
-        subject: selectedSubject.subjectName,
-        author: user.username,
+        subject: selectedSubject,
+        author: user,
         likes: 0,
         likedBy: []
       }));
+
+      // Обновляем посты пользователя
+      dispatch(fetchUserPosts(user.id));
   
       onClose();
     } catch (err) {

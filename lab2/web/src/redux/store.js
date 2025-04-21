@@ -9,4 +9,5 @@ export const store = configureStore({
     subjects: subjectsReducer,
     posts: postsReducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 });

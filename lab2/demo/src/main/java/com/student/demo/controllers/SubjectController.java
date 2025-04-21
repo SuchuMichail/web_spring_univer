@@ -37,6 +37,7 @@ public class SubjectController {
 
     @GetMapping("/getSubjects")
     public ResponseEntity<?> getSubjects() {
+        System.out.println("RETURN GETSUBJECTS\n" + subjectService.getSubjects());
         return new ResponseEntity<>(subjectService.getSubjects(), HttpStatus.OK);
     }
 }

@@ -48,6 +48,11 @@ const authSlice = createSlice({
       state.user = null;
       state.isAdmin = false;
       state.error = null;
+    },
+    addUserPost: (state, action) => {
+      if (state.user) {
+        state.user.userPosts = [action.payload, ...state.user.userPosts];
+      }
     }
   },
   extraReducers: (builder) => {

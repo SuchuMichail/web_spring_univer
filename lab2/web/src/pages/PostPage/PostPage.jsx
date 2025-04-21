@@ -17,12 +17,19 @@ const PostPage = () => {
 
   const [downloadingFile, setDownloadingFile] = useState(null);
   const [error, setError] = useState(null);
-
+/*
   useEffect(() => {
-    if (user?.id) {
-      dispatch(fetchUserPosts(user.id)); // Загружаем посты пользователя
-    }
-  }, [dispatch, user]);
+    const loadData = async () => {
+      if (user?.id) {
+        try {
+          await dispatch(fetchUserPosts(user.id));
+        } catch (err) {
+          console.error('Failed to load posts:', err);
+        }
+      }
+    };
+    loadData();
+  }, [dispatch, user]);*/
 
   useEffect(() => {
     if (!post && postId) {
@@ -31,11 +38,13 @@ const PostPage = () => {
           const response = await fetchPostById(postId); // Используем fetchPostById
           const normalizedPost = {
             ...response.post,
-            subject: response.post.subject || null,
-            author: response.post.author,
+            subject: response.subject || {id: null, subjectName: 'Неизвестно'},
+            author: response.author || null,
             files: response.files || [],
             likedBy: response.likedBy || []
           };
+
+          console.log("NORM POST = \n",normalizedPost)
           dispatch(addPost(normalizedPost)); // Сохраняем пост в Redux
         } catch (err) {
           console.error('Ошибка загрузки поста:', err);
@@ -99,9 +108,9 @@ const PostPage = () => {
   return (
     <div className="post-page">
       <div className="post-header">
-        <span className="post-subject">{post.subject}</span>
+        <span className="post-subject">{post.subject.subjectName}</span>
         <h1>{post.title}</h1>
-        <p className="post-author">Автор: {post.author?.name || 'Неизвестен'}</p>
+        <p className="post-author">Автор: {post.author?.username || 'Неизвестен'}</p>
       </div>
 
       <div className="post-content">
@@ -145,8 +154,8 @@ const PostPage = () => {
         >
           {isLiked ? '♥' : '♡'} {post.likes}
         </button>
-        <Link to={post.subject ? `/subject/${post.subject.id}` : '#'} className="btn btn-outline">
-          Назад к предмету
+        <Link to={post.subject?.id ? `/subject/${post.subject.id}` : '#'} className="btn btn-outline">
+          К предмету
         </Link>
       </div>
     </div>

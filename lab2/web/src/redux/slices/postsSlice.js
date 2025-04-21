@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { addPost as apiAddPost, getPosts, deletePost, fetchUserPosts as apiFetchUserPosts } from '../../api/api';
+import { addPost as apiAddPost, 
+          fetchPostsBySubjectId as apiFetchPostsBySubjectId, 
+          fetchUserPosts as apiFetchUserPosts } from '../../api/api';
 
 // Асинхронные Thunk-функции
 export const createPost = createAsyncThunk(
@@ -19,7 +21,23 @@ export const fetchUserPosts = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       const response = await apiFetchUserPosts(userId);
+
+      console.log("User Posts\n",response.data)
+
       return response.data;
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+// Добавляем новый action
+export const fetchPostsBySubjectId = createAsyncThunk(
+  'posts/fetchBySubjectId',
+  async (subjectId, { rejectWithValue }) => {
+    try {
+      const response = await apiFetchPostsBySubjectId(subjectId);
+      return response;
     } catch (err) {
       return rejectWithValue(err.message);
     }
@@ -30,6 +48,7 @@ const postsSlice = createSlice({
   name: 'post',
   initialState: {
     items: [],
+    postsBySubject: [],
     status: 'idle',
     error: null,
     userPosts: [], // Отдельное поле для постов пользователя
@@ -72,7 +91,14 @@ const postsSlice = createSlice({
       })
       .addCase(createPost.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.items.push(action.payload);
+
+        const newPost = action.payload;
+        state.items.push(newPost);
+
+        // Добавляем пост в userPosts, если автор - текущий пользователь
+        if (state.userPosts.some(post => post.author?.id === newPost.author?.id)) {
+          state.userPosts.unshift(newPost); // Добавляем в начало (новые сверху)
+        }
       })
       .addCase(createPost.rejected, (state, action) => {
         state.status = 'failed';
@@ -87,6 +113,8 @@ const postsSlice = createSlice({
         state.status = 'succeeded';
         state.userPosts = action.payload;
 
+        console.log("actionpayload = ", action.payload)
+
         // Добавьте посты в общий список
         action.payload.forEach(post => {
           if (!state.items.some(p => p.id === post.id)) {
@@ -97,7 +125,24 @@ const postsSlice = createSlice({
       .addCase(fetchUserPosts.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
+      })
+      
+      //////////////////////////////////
+      // Обработка fetchPostsBySubjectId
+      .addCase(fetchPostsBySubjectId.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchPostsBySubjectId.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        console.log("ACTION PAYLOAD\n",action.payload)
+        state.postsBySubject = action.payload || [];
+        console.log('Posts loaded:', action.payload);
+      })
+      .addCase(fetchPostsBySubjectId.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
       });
+
   }
 });
 

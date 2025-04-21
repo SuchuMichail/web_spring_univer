@@ -42,6 +42,16 @@ const Profile = () => {
     return <AuthModal onClose={() => setShowAuthModal(false)} />;
   }
 
+  const sortedUserPosts = [...userPosts].sort((a, b) => {
+    // Если есть дата создания
+    /*if (a.createdAt && b.createdAt) {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }*/
+
+    // Иначе сортируем по ID (предполагаем, что новые посты имеют больший ID)
+    return b.id - a.id;
+  });
+
   if (!user) {
     return (
       <div className="profile">
@@ -93,10 +103,10 @@ const Profile = () => {
         </div>
         
         <div className="user-posts-section">
-          <h2>Мои публикации ({userPosts.length})</h2>
-          {userPosts.length > 0 ? (
+          <h2>Мои публикации ({sortedUserPosts.length})</h2>
+          {sortedUserPosts.length > 0 ? (
             <div className="posts-list">
-              {userPosts.map(post => (
+              {sortedUserPosts.map(post => (
                 <Post key={post.id} post={post} />
               ))}
             </div>

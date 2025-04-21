@@ -60,6 +60,13 @@ public class PostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> fetchPostById(@PathVariable("id") long id){
+        System.out.println("RESULT FIND POST = \n" + postService.fetchPostById(id));
         return new ResponseEntity<>(postService.fetchPostById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/fetchPostsBySubjectId/{id}")
+    public ResponseEntity<?> fetchPostsBySubjectId(@PathVariable("id") long id){
+        System.out.println("III FIND POSTsss = \n" + postService.fetchPostsBySubjectId(id));
+        return new ResponseEntity<>(postService.fetchPostsBySubjectId(id), HttpStatus.OK);
     }
 }

@@ -74,6 +74,13 @@ export const addPost = (formData) => fileAPI.post('/api/post/addPost', formData)
 export const fetchPostById = (postId) => API.get(`/api/post/${postId}`)
     .then(response => response.data);
 
+export const fetchPostsBySubjectId = (subjectId) => 
+  API.get(`/api/post/fetchPostsBySubjectId/${subjectId}`)
+    .then(response => {
+      console.log("REEEEESPONSEEE DATA = \n",response.data)
+      return response.data;});
+
+
 export const deletePost = (postId) => API.delete(`/post/${postId}`);
 export const downloadFile = (postId, fileId) => API.get(`/post/${postId}/files/${fileId}`, 
   { responseType: 'blob' }
@@ -85,7 +92,7 @@ export const downloadFile = (postId, fileId) => API.get(`/post/${postId}/files/$
 export const addSubject = (subjectName) => 
   API.post('/api/subject/addSubject', {subjectName})                                
       .then(response => {
-        const data = response.data.subjectData; // Извлекаем subjectData;
+        const data = response.data.subject; // Извлекаем subjectData;
         console.log('data: ', data);
         return data;
       }); 

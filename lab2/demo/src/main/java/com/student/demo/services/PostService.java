@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PostService {
@@ -49,6 +51,18 @@ public class PostService {
 
     public FullPostDTO fetchPostById(long id){
         return new FullPostDTO(postRepository.findById(id).orElseThrow(IllegalArgumentException::new));
+    }
+
+    public List<FullPostDTO> fetchPostsBySubjectId(long id){
+        List<PostData> repRes = postRepository.fetchPostsBySubjectId(id);
+
+        List<FullPostDTO> result = new ArrayList<>(repRes.size());
+
+        for(PostData postData : repRes){
+            result.add(new FullPostDTO(postData));
+        }
+
+        return result;
     }
 
     public void deletePost(DeletePostRequest deletePostRequest){
