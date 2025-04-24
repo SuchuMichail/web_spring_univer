@@ -41,6 +41,7 @@ public class UserController {
 
     @GetMapping("{userId}/getPosts")
     public ResponseEntity<?> getPosts(@PathVariable("userId") long id){
+        System.out.println("I RETURN THAT POSTS\n" + userService.getPosts(id));
         return new ResponseEntity<>(userService.getPosts(id), HttpStatus.OK);
     }
 }

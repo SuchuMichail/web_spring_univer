@@ -19,9 +19,9 @@ const Post = ({ post }) => {
     }
   };
 
-  console.log('Post data:', post);
+  /*console.log('Post data:', post);
 console.log('LikedBy:', post.likedBy);
-console.log('User:', user);
+console.log('User:', user);*/
 
   return (
     <Link to={`/post/${post.id}`} className="post-card">

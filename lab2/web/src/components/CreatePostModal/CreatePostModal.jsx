@@ -80,89 +80,6 @@ const CreatePostModal = ({ onClose }) => {
 
 
 
-
-
-  // Отправка формы
-  /*const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log('Начало обработки submit'); 
-    
-    if (!formData.subjectId) {
-      setError('Выберите предмет');
-      return;
-    }
-
-    if (!subjectsStatus) {
-      setError('Список предметов еще не загружен');
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Находим выбранный предмет
-      const selectedSubject = subjects.find(subj => subj.id == formData.subjectId);
-      if (!selectedSubject) {
-        throw new Error('Выбранный предмет не найден');
-      }
-
-      // Формируем данные для отправки
-      //const postData = {
-      //  title: formData.title,
-     //   text: formData.text,
-     //   subject: selectedSubject,
-     //   author: user,
-     //   files: formData.files
-     // };
-      const formDataToSend = new FormData(); // Используем FormData для multipart
-      formDataToSend.append('title', formData.title);
-      formDataToSend.append('text', formData.text);
-
-      
-      formDataToSend.append('subject', JSON.stringify(selectedSubject));
-      formDataToSend.append('author', JSON.stringify(user));
-
-      // Добавляем файлы
-      if (formData.files && formData.files.length > 0) {
-        formData.files.forEach(file => {
-          formDataToSend.append('files', file);
-        });
-      }
-
-      console.log('Отправляемые данные:', formDataToSend);
-      console.log('Отправляемые данные:', {
-        title: formData.title,
-        text: formData.text,
-        subject: selectedSubject,
-        author: user,
-        files: formData.files
-      });
-
-      // Используем метод из api.js
-      const response = await apiAddPost(formDataToSend);
-      console.log('Ответ сервера:', response);
-
-      // Обновляем хранилище Redux
-      dispatch(addPost({
-        ...response.data,
-        //id: response.data.id || Date.now(), // временный ID, если сервер не вернул
-        author: user.username,
-        //subject: subjects.find(subj => subj.id == formData.subjectId).subjectName,
-        subject: selectedSubject.subjectName,
-        likes: 0,
-        likedBy: []
-      }));
-
-      onClose();
-    } catch (err) {
-      console.error('Ошибка создания поста:', err);
-      setError(err.response?.data?.message || 'Ошибка при создании поста');
-    } finally {
-      setIsLoading(false);
-    }
-  };*/
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -180,6 +97,7 @@ const CreatePostModal = ({ onClose }) => {
       if (!selectedSubject) {
         throw new Error('Предмет не найден');
       }
+      console.log("IM Here")
   
       // 2. Формируем FormData
       const formDataToSend = new FormData();
@@ -190,10 +108,13 @@ const CreatePostModal = ({ onClose }) => {
       formDataToSend.append('subjectId', selectedSubject.id);
       formDataToSend.append('authorId', user.id);
   
-      // 3. Добавляем файлы
+      // Добавляем файлы с проверкой размера
       if (formData.files?.length > 0) {
-        formData.files.forEach((file, index) => {
-          formDataToSend.append(`files`, file);
+        formData.files.forEach(file => {
+          if (file.size > 10 * 1024 * 1024) { // 10MB лимит
+            throw new Error(`Файл ${file.name} слишком большой (макс. 10MB)`);
+          }
+          formDataToSend.append('files', file);
         });
       }
   
@@ -204,20 +125,33 @@ const CreatePostModal = ({ onClose }) => {
   
       // 4. Отправка
       const response = await apiAddPost(formDataToSend);
+
+      if (!response.data) {
+        throw new Error('Пустой ответ от сервера');
+      }
+
+      console.log("User: ",user)
       
+      console.log("I catch response data", response.data)
+      console.log("I catch response data post id", response.data.post.id)
       // 5. Обработка успешного ответа
       dispatch(addPost({
-        id: response.data.id,
-        title: response.data.title,
-        text: response.data.text,
+        post: {
+          id: response.data.post.id,
+          title: response.data.post.title,
+          text: response.data.post.text
+        },
         subject: selectedSubject,
         author: user,
         likes: 0,
-        likedBy: []
+        likedBy: [],
+        files: response.data.files || []
       }));
 
-      // Обновляем посты пользователя
-      dispatch(fetchUserPosts(user.id));
+      
+
+      // Принудительно обновляем посты пользователя
+      await dispatch(fetchUserPosts(user.id));
   
       onClose();
     } catch (err) {
@@ -227,6 +161,7 @@ const CreatePostModal = ({ onClose }) => {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>

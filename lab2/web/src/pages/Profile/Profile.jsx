@@ -11,19 +11,20 @@ import './Profile.css';
 const Profile = () => {
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(false);
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector(state => state.auth);
-  const posts = useSelector(state => state.posts.items);
-  
-  //const userPosts = user ? posts.filter(post => post.author === user.id) : [];
-  //const likedPosts = user ? posts.filter(post => post.likedBy?.includes(user.id)) : [];
+  const { userPosts } = useSelector(state => state.posts);
 
-  const userPosts = user?.userPosts || [];
-  const likedPosts = user?.likedPosts || [];
+  console.log("USER: ", user)
 
-  console.log("user = ", user)
+  const likedPosts = useSelector(state => 
+    state.posts.items.filter(post => 
+      post.likedBy?.includes(user?.id)
+    )
+  );
 
   const handleLogout = () => {
     dispatch(logout());
@@ -31,26 +32,21 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    console.log("RENDERRRRRRRRRRR\n",user)
+    console.log("Profile renderrrrr\n",user)
 
     if (user?.id) {
       dispatch(fetchUserPosts(user.id));
     }
-  }, [dispatch, user]);
+  }, [dispatch, user?.id, forceUpdate]);
 
   if (showAuthModal) {
     return <AuthModal onClose={() => setShowAuthModal(false)} />;
   }
 
-  const sortedUserPosts = [...userPosts].sort((a, b) => {
-    // Если есть дата создания
-    /*if (a.createdAt && b.createdAt) {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    }*/
+  const sortedUserPosts = [...(userPosts || [])].reverse();
 
-    // Иначе сортируем по ID (предполагаем, что новые посты имеют больший ID)
-    return b.id - a.id;
-  });
+  console.log("sortedUserPosts\n",sortedUserPosts)
+  
 
   if (!user) {
     return (
@@ -69,7 +65,6 @@ const Profile = () => {
       </div>
     );
   }
-
   
 
   return (
@@ -107,7 +102,7 @@ const Profile = () => {
           {sortedUserPosts.length > 0 ? (
             <div className="posts-list">
               {sortedUserPosts.map(post => (
-                <Post key={post.id} post={post} />
+                <Post key={post.post.id} post={post.post} />
               ))}
             </div>
           ) : (
@@ -120,7 +115,7 @@ const Profile = () => {
           {likedPosts.length > 0 ? (
             <div className="posts-list">
               {likedPosts.map(post => (
-                <Post key={post.id} post={post} />
+                <Post key={post.post.id} post={post.post} />
               ))}
             </div>
           ) : (

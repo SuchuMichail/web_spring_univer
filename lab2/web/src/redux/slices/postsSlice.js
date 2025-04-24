@@ -9,6 +9,7 @@ export const createPost = createAsyncThunk(
   async (postData, { rejectWithValue }) => {
     try {
       const response = await apiAddPost(postData);
+      console.log("I get from server after createPost\n",response.data)
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -22,7 +23,7 @@ export const fetchUserPosts = createAsyncThunk(
     try {
       const response = await apiFetchUserPosts(userId);
 
-      console.log("User Posts\n",response.data)
+      console.log("User Posts (after fetchUserPosts)\n",response.data)
 
       return response.data;
     } catch (err) {
@@ -56,11 +57,25 @@ const postsSlice = createSlice({
   },
   reducers: {
     // Синхронные редьюсеры
-    addPost: (state, action) => {
+    /*addPost: (state, action) => {
       const newPost = {
         id: action.payload.id,
         title: action.payload.title,
         text: action.payload.text,
+        subject: action.payload.subject,
+        author: action.payload.author,
+        files: action.payload.files || [],
+        likes: 0,
+        likedBy: []
+      };
+      state.items.push(newPost);
+    },*/
+    addPost: (state, action) => {
+      const postData = action.payload.post || action.payload;
+      const newPost = {
+        id: postData.id,
+        title: postData.title,
+        text: postData.text,
         subject: action.payload.subject,
         author: action.payload.author,
         files: action.payload.files || [],
@@ -89,17 +104,59 @@ const postsSlice = createSlice({
       .addCase(createPost.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(createPost.fulfilled, (state, action) => {
+      /*.addCase(createPost.fulfilled, (state, action) => {
         state.status = 'succeeded';
 
-        const newPost = action.payload;
-        state.items.push(newPost);
+       // const newPost = action.payload;
+       // state.items.unshift(newPost); // Новые посты в начало
+
+        const postData = action.payload.post || action.payload;
+        const newPost = {
+          id: postData.id,
+          title: postData.title,
+          text: postData.text,
+          subject: postData.subject,
+          author: postData.author,
+          files: postData.files || [],
+          likes: 0,
+          likedBy: []
+        };
+
+        state.items.unshift(newPost);
+        state.userPosts.unshift(newPost);
+
+        //state.items.push(newPost);
+
+          // Обновляем postsBySubject если пост относится к текущему предмету
+        //if (newPost.subject?.id) {
+      //    state.postsBySubject.unshift(newPost);
+       // }
 
         // Добавляем пост в userPosts, если автор - текущий пользователь
-        if (state.userPosts.some(post => post.author?.id === newPost.author?.id)) {
-          state.userPosts.unshift(newPost); // Добавляем в начало (новые сверху)
-        }
+      //  if (state.userPosts.some(post => post.author?.id === newPost.author?.id)) {
+      //    state.userPosts.unshift(newPost); // Добавляем в начало (новые сверху)
+      //  }
+      })*/
+
+      .addCase(createPost.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        
+        const responseData = action.payload;
+        const newPost = {
+          id: responseData.post.id,
+          title: responseData.post.title,
+          text: responseData.post.text,
+          subject: responseData.subject,
+          author: responseData.author,
+          files: responseData.files || [],
+          likes: 0,
+          likedBy: []
+        };
+      
+        state.items.unshift(newPost);
+        state.userPosts.unshift(newPost);
       })
+
       .addCase(createPost.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
@@ -109,19 +166,96 @@ const postsSlice = createSlice({
       .addCase(fetchUserPosts.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(fetchUserPosts.fulfilled, (state, action) => {
+      /*.addCase(fetchUserPosts.fulfilled, (state, action) => {
         state.status = 'succeeded';
+
+        // Преобразуем данные к единому формату
+        // Проверяем структуру данных и нормализуем
+        const userPosts = action.payload.map(post => {
+          // Если данные вложены в поле post (как в FullPostDTO)
+          const postData = post.post || post;
+          
+          return {
+            id: postData.id,
+            title: postData.title,
+            text: postData.text,
+            subject: postData.subject || post.subject,
+            author: postData.author || post.author,
+            files: postData.files || post.files || [],
+            likes: postData.likes || post.likes || 0,
+            likedBy: postData.likedBy || post.likedBy || []
+          };
+        });
+
+        console.log("Normalized user posts:", action.payload.map(post => ({
+          id: post.id,
+          title: post.title,
+          // ... другие поля
+        })));
+
+        // Сохраняем посты как есть, сортировка будет на уровне компонента
         state.userPosts = action.payload;
+
+
 
         console.log("actionpayload = ", action.payload)
 
-        // Добавьте посты в общий список
-        action.payload.forEach(post => {
-          if (!state.items.some(p => p.id === post.id)) {
-            state.items.push(post);
+        // Обновляем общий список
+        //action.payload.forEach(post => {
+      //    if (!state.items.some(p => p.id === post.id)) {
+       //     state.items.push(post);
+       //   }
+       // });
+
+        // Обновляем общий список
+        userPosts.forEach(post => {
+          const existingIndex = state.items.findIndex(p => p.id === post.id);
+          if (existingIndex >= 0) {
+            state.items[existingIndex] = post; // Обновляем существующий
+          } else {
+            state.items.push(post); // Добавляем новый
           }
         });
-      })
+      })*/
+
+        .addCase(fetchUserPosts.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          
+          console.log('Данные с сервера:', action.payload);
+
+          console.log('Старые userPosts:', state.userPosts); 
+
+          // Нормализуем данные с сервера
+          const userPosts = action.payload.map(item => ({
+            post: {
+              id: item.post.id,
+              title: item.post.title,
+              text: item.post.text
+            },
+            subject: item.subject,
+            author: item.author,
+            files: item.files || [],
+            likes: item.post.likes || 0,
+            likedBy: item.likedBy || []
+          }));
+
+          
+        
+          state.userPosts = userPosts;
+          
+          // Обновляем общий список
+          userPosts.forEach(post => {
+            const existingIndex = state.items.findIndex(p => p.id === post.id);
+            if (existingIndex >= 0) {
+              state.items[existingIndex] = post;
+            } else {
+              state.items.push(post);
+            }
+          });
+
+          console.log('Обновлённые userPosts в Redux:', state.userPosts);
+        })
+
       .addCase(fetchUserPosts.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;

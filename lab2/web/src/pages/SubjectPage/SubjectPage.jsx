@@ -28,6 +28,8 @@ const SubjectPage = () => {
   console.log('Subject ID:', subjectId);
   console.log('Status:', status);
 
+  const reversedPosts = [...postsBySubject].reverse();
+
   if (status === 'loading') {
     return <div className="loading">Загрузка...</div>;
   }
@@ -45,8 +47,8 @@ const SubjectPage = () => {
         </div>
         
         <div className="posts-list">
-          {Array.isArray(postsBySubject) && postsBySubject.length > 0 ? (
-            postsBySubject.map(post => (
+          {Array.isArray(reversedPosts) && reversedPosts.length > 0 ? (
+            reversedPosts.map(post => (
               <div key={post.post.id} className="post-wrapper">
                 <Post post={post.post} />
               </div>

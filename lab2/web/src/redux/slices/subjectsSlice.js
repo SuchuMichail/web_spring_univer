@@ -123,17 +123,6 @@ const subjectsSlice = createSlice({
         console.log('Данные в хранилище:', state.list);
       });
   }
-  /*reducers: {
-      getSubjects: (state, action) => {
-        state.list = action.payload;
-      },
-      addSubject: (state, action) => {
-        state.list.push(action.payload);
-      },
-      deleteSubject: (state, action) => {
-        state.list = state.list.filter(subject => subject.id !== action.payload);
-      }
-  }*/
 });
 
 //export const { getSubjects, addSubject, deleteSubject } = subjectsSlice.actions;
