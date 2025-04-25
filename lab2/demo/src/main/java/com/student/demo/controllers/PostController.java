@@ -1,5 +1,6 @@
 package com.student.demo.controllers;
 
+import com.student.demo.entities.PostFile;
 import com.student.demo.entities.SubjectData;
 import com.student.demo.entities.UserData;
 import com.student.demo.repositories.ISubjectRepository;
@@ -9,6 +10,7 @@ import com.student.demo.requests.post.DeletePostRequest;
 import com.student.demo.services.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ public class PostController {
     private ISubjectRepository subjectRepository;
 
 
+
     public PostController(PostService postService) {
         this.postService = postService;
     }
@@ -40,7 +43,7 @@ public class PostController {
                                      @RequestParam Long subjectId,
                                      @RequestParam Long authorId,
                                      @RequestParam(required = false) List<MultipartFile> files) throws IOException {
-        System.out.println("TRY ADDPOST");
+        //System.out.println("TRY ADDPOST");
         // Получаем полные объекты из ID
         SubjectData subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new RuntimeException("Subject not found"));
@@ -60,7 +63,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> fetchPostById(@PathVariable("id") long id){
-        System.out.println("RESULT FIND POST = \n" + postService.fetchPostById(id));
+       // System.out.println("RESULT FIND POST = \n" + postService.fetchPostById(id));
         return new ResponseEntity<>(postService.fetchPostById(id), HttpStatus.OK);
     }
 
@@ -68,5 +71,14 @@ public class PostController {
     public ResponseEntity<?> fetchPostsBySubjectId(@PathVariable("id") long id){
         System.out.println("III FIND POSTsss = \n" + postService.fetchPostsBySubjectId(id));
         return new ResponseEntity<>(postService.fetchPostsBySubjectId(id), HttpStatus.OK);
+    }
+
+    @GetMapping("/files/{fileId}")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable Long fileId) {
+        PostFile file = postService.findPostFileByFileId(fileId);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
+                .body(file.getData());
     }
 }

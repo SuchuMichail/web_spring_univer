@@ -129,6 +129,35 @@
     text-decoration: none;
   }
   
+  .auth-modal-container {
+    width: 400px;
+    max-width: 90%;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .switch-mode-btn {
+    background: none;
+    border: none;
+    color: #3498db;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
   @keyframes modalFadeIn {
     from {
       opacity: 0;

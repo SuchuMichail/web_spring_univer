@@ -27,17 +27,18 @@ public class AddUserRequest {
     @NotBlank
     @Length(min = 1, max = 100)
     private String university;
-    private String group;
+    @NotNull
+    private String userGroup;
 
     /*@Getter(AccessLevel.NONE)
     private boolean isAdmin;*/
 
-    @ConstructorProperties({"login", "password", "username", "university", "group"})
-    public AddUserRequest(@NotNull String login, @NotNull String password, @NotNull String username, @NotNull String university, String group) {
+    @ConstructorProperties({"login", "password", "username", "university", "userGroup"})
+    public AddUserRequest(@NotNull String login, @NotNull String password, @NotNull String username, @NotNull String university, String userGroup) {
         this.login = login;
         this.password = password;
         this.username = username;
         this.university = university;
-        this.group = group;
+        this.userGroup = userGroup;
     }
 }

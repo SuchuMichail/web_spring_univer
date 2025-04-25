@@ -1,5 +1,22 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { loginUser, checkAdmin } from '../../api/api';
+import { loginUser, registerUser } from '../../api/api';
+
+
+export const register = createAsyncThunk(
+  'auth/register',
+  async (userData, { rejectWithValue }) => {
+    try {
+      console.log("Register UserData:\n",userData)
+      const response = await registerUser(userData);
+
+      console.log("I get response = \n",response.data)
+
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
 
 
 export const login = createAsyncThunk(
@@ -84,6 +101,19 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.user = null;
         state.isAdmin = false;
+      })
+
+      //register
+
+      .addCase(register.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        console.log("action_payload = ",action.payload)
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
       });
   }
 });

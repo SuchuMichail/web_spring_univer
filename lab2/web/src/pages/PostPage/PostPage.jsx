@@ -80,21 +80,24 @@ const PostPage = () => {
     setError(null);
     
     try {
-      const response = await downloadFile(post.id, fileId);
+      const response = await downloadFile(postId, fileId);
       
       // Создаем временную ссылку для скачивания
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.download = fileName;
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       
       // Очистка
-      setTimeout(() => {
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      }, 100);
+     // setTimeout(() => {
+    //    document.body.removeChild(link);
+    //    URL.revokeObjectURL(url);
+    //  }, 100);
+    // Очистка
+      link.parentNode.removeChild(link);
+      URL.revokeObjectURL(url);
 
     } catch (err) {
       console.error('Ошибка загрузки файла:', err);
@@ -102,6 +105,15 @@ const PostPage = () => {
     } finally {
       setDownloadingFile(null);
     }
+  };
+
+  const getFileIcon = (fileType) => {
+    if (fileType.startsWith('image/')) return '🖼️';
+    if (fileType.includes('pdf')) return '📕';
+    if (fileType.includes('word')) return '📄';
+    if (fileType.includes('excel')) return '📊';
+    if (fileType.includes('zip')) return '🗜️';
+    return '📁';
   };
 
   console.log("post.files?.length > 0",post.files?.length > 0)
@@ -135,7 +147,7 @@ const PostPage = () => {
                 onClick={() => handleFileDownload(file.id, file.name)}
               >
                 <span className="file-icon">
-                  {file.type?.startsWith('image/') ? '🖼️' : '📄'}
+                  {getFileIcon(file.type)}
                 </span>
                 <span className="file-name">{file.name}</span>
                 {file.size && (

@@ -2,15 +2,13 @@ package com.student.demo.services;
 
 import com.student.demo.entities.PostData;
 import com.student.demo.entities.UserData;
+import com.student.demo.exceptions.LoginExistsException;
 import com.student.demo.repositories.IUserRepository;
 import com.student.demo.requests.user.AddUserRequest;
 import com.student.demo.requests.user.DeleteUserRequest;
 import com.student.demo.requests.user.LoginPasswordRequest;
 import com.student.demo.responses.post.FullPostDTO;
-import com.student.demo.responses.post.PostWithFilesAndLikedByDTO;
-import com.student.demo.responses.post.PostWithFilesDTO;
 import com.student.demo.responses.user.AddUserResponse;
-import com.student.demo.responses.user.GetUserByLPResponse;
 import com.student.demo.responses.user.UserDTO;
 import com.student.demo.responses.user.UserWithPostsDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +22,23 @@ public class UserService {
     @Autowired
     private IUserRepository userRepository;
 
-    public AddUserResponse addUser(AddUserRequest addUserRequest){
+    public UserDTO addUser(AddUserRequest addUserRequest) throws LoginExistsException {
+        if (!userRepository.existsByLogin(addUserRequest.getLogin()).isEmpty()) {
+            throw new LoginExistsException("Пользователь с таким логином уже существует");
+        }
+
         UserData userData = new UserData(
                 null,
                 addUserRequest.getLogin(),
                 addUserRequest.getPassword(),
                 addUserRequest.getUsername(),
                 addUserRequest.getUniversity(),
-                addUserRequest.getGroup()
+                addUserRequest.getUserGroup()
         );
 
         UserData saved = userRepository.save(userData);
 
-        return new AddUserResponse(saved);
+        return new UserDTO(saved);
     }
 
     public void deleteUser(DeleteUserRequest deleteUserRequest){

@@ -25,4 +25,10 @@ public interface IUserRepository extends JpaRepository<UserData,Long> {
     @Query("SELECT ud FROM UserData AS ud "+
             "WHERE ud.id = :id")
     List<UserData> getUserById(@Param(value = "id") long id);
+
+    @Transactional
+    @Modifying
+    @Query("SELECT ud FROM UserData AS ud "+
+            "WHERE ud.login = :login")
+    List<UserData> existsByLogin(@Param(value = "login") String login);
 }

@@ -40,7 +40,6 @@ API.interceptors.response.use(
 /****************************************************************************************** */
 
 // User endpoints
-export const registerUser = (userData) => API.post('/user/register', userData);
 export const deleteUser = (userId) => API.delete(`/user/${userId}`);
 
 export const fetchUserPosts = (userId) => API.get(`/api/user/${userId}/getPosts`);
@@ -67,6 +66,26 @@ export const loginUser = (credentials) =>
       throw error;
     });
 
+export const registerUser = async (userData) => {
+  return API.post('/api/user/register', userData)
+    .then(response => {
+      const data = response.data; // Извлекаем subjectData;
+      console.log('data: ', data);
+      return response;
+    })
+    .catch(error => {
+      // Преобразуем ошибку API в читаемый формат
+      const apiError = error.response?.data;
+      if (apiError) {
+        throw new Error(
+          apiError.message || 
+          apiError.error || 
+          'Ошибка регистрации'
+        );
+      }
+      throw error;
+    });
+};
 
 /***************************************************************************************** */
 
@@ -88,7 +107,7 @@ export const fetchPostsBySubjectId = (subjectId) =>
 
 
 export const deletePost = (postId) => API.delete(`/post/${postId}`);
-export const downloadFile = (postId, fileId) => API.get(`/post/${postId}/files/${fileId}`, 
+export const downloadFile = (postId, fileId) => fileAPI.get(`/api/post/files/${fileId}`, 
   { responseType: 'blob' }
 );
 

@@ -68,4 +68,9 @@ public class PostService {
     public void deletePost(DeletePostRequest deletePostRequest){
         postRepository.deleteById(deletePostRequest.getId());
     }
+
+    public PostFile findPostFileByFileId(long fileId){
+        return postFileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+    }
 }
