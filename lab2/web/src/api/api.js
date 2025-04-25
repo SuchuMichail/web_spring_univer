@@ -10,7 +10,7 @@ const API = axios.create({
 
 const fileAPI = axios.create({
   baseURL: 'http://localhost:8080',
-  withCredentials: true, // Для отправки кук/сессий
+  withCredentials: true, 
   headers: {
     'Content-Type': 'multipart/form-data',
   }
@@ -36,6 +36,8 @@ API.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+/****************************************************************************************** */
 
 // User endpoints
 export const registerUser = (userData) => API.post('/user/register', userData);
@@ -66,13 +68,17 @@ export const loginUser = (credentials) =>
     });
 
 
+/***************************************************************************************** */
 
 // Post endpoints
 export const addPost = (formData) => fileAPI.post('/api/post/addPost', formData);
 
 
 export const fetchPostById = (postId) => API.get(`/api/post/${postId}`)
-    .then(response => response.data);
+    .then(response => {
+      console.log("(fetchPostById) Post data with files:", response.data);
+      return response.data;
+    });
 
 export const fetchPostsBySubjectId = (subjectId) => 
   API.get(`/api/post/fetchPostsBySubjectId/${subjectId}`)
@@ -87,6 +93,7 @@ export const downloadFile = (postId, fileId) => API.get(`/post/${postId}/files/$
 );
 
 
+/********************************************************************************************** */
 
 // Subject endpoints
 export const addSubject = (subjectName) => 
@@ -124,4 +131,4 @@ export const deleteSubject = (subjectId) => {
 
 
 // Admin check
-export const checkAdmin = (userId) => API.get(`/user/${userId}/admin`);
+//export const checkAdmin = (userId) => API.get(`/user/${userId}/admin`);

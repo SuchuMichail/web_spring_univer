@@ -17,25 +17,15 @@ const PostPage = () => {
 
   const [downloadingFile, setDownloadingFile] = useState(null);
   const [error, setError] = useState(null);
-/*
-  useEffect(() => {
-    const loadData = async () => {
-      if (user?.id) {
-        try {
-          await dispatch(fetchUserPosts(user.id));
-        } catch (err) {
-          console.error('Failed to load posts:', err);
-        }
-      }
-    };
-    loadData();
-  }, [dispatch, user]);*/
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
-    if (!post && postId) {
+    //if (!post && postId) {
       const loadPost = async () => {
         try {
-          const response = await fetchPostById(postId); // Используем fetchPostById
+          setIsLoading(true);
+          const response = await fetchPostById(postId); 
           const normalizedPost = {
             ...response.post,
             subject: response.subject || {id: null, subjectName: 'Неизвестно'},
@@ -46,13 +36,24 @@ const PostPage = () => {
 
           console.log("NORM POST = \n",normalizedPost)
           dispatch(addPost(normalizedPost)); // Сохраняем пост в Redux
+
+          console.log("Я добавил post")
         } catch (err) {
           console.error('Ошибка загрузки поста:', err);
+        } finally {
+          setIsLoading(false);
         }
       };
-      loadPost();
-    }
+      if (!post?.files?.length) { // Загружаем, если нет файлов
+        loadPost();
+      }
+      //loadPost();
+   // }
   }, [postId, post, dispatch]);
+
+  if (isLoading) {
+    return <div>Загрузка поста...</div>;
+  }
 
   if (!post) {
     return (
@@ -103,7 +104,8 @@ const PostPage = () => {
     }
   };
 
-  
+  console.log("post.files?.length > 0",post.files?.length > 0)
+  console.log("post = \n",post)
 
   return (
     <div className="post-page">
@@ -116,13 +118,17 @@ const PostPage = () => {
       <div className="post-content">
         <p>{post.text}</p>
       </div>
-
-      {post.files?.length > 0 && (
+      
+      {Array.isArray(post.files) && post.files.length > 0 && (
         <div className="post-files">
           <h3>Прикрепленные файлы:</h3>
           {error && <div className="error-message">{error}</div>}
           <ul className="files-list">
-            {post.files.map((file, index) => (
+            {post.files.map((file, index) => {
+              console.log("I TRY TO SHOW THIS POST\n",post);
+              console.log("file = \n",file);
+              console.log("downloadingFile = \n",downloadingFile);
+              return (
               <li 
                 key={file.id || index}
                 className={`file-item ${downloadingFile === file.name ? 'downloading' : ''}`}
@@ -141,7 +147,7 @@ const PostPage = () => {
                   <span className="download-spinner">⏳</span>
                 )}
               </li>
-            ))}
+            )})}
           </ul>
         </div>
       )}

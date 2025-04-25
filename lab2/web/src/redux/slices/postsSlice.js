@@ -72,17 +72,33 @@ const postsSlice = createSlice({
     },*/
     addPost: (state, action) => {
       const postData = action.payload.post || action.payload;
-      const newPost = {
-        id: postData.id,
-        title: postData.title,
-        text: postData.text,
-        subject: action.payload.subject,
-        author: action.payload.author,
-        files: action.payload.files || [],
-        likes: 0,
-        likedBy: []
-      };
-      state.items.push(newPost);
+      const existingIndex = state.items.findIndex(p => p.id === postData.id);
+
+      console.log("postData = \n",postData)
+      console.log("existingIndex = ",existingIndex)
+
+      if (existingIndex >= 0) {
+        // Обновляем существующий пост
+        //console.log("old state.items[existingIndex] = \n",state.items[existingIndex])
+        state.items[existingIndex] = {
+          ...state.items[existingIndex],
+          ...postData,
+          files: postData.files || state.items[existingIndex].files,
+          likedBy: postData.likedBy || state.items[existingIndex].likedBy
+        };
+      } else {
+        const newPost = {
+          id: postData.id,
+          title: postData.title,
+          text: postData.text,
+          subject: action.payload.subject,
+          author: action.payload.author,
+          files: action.payload.files || [],
+          likes: 0,
+          likedBy: []
+        };
+        state.items.unshift(newPost);
+      }
     },
     toggleLike: (state, action) => {
       const post = state.items.find(p => p.id === action.payload.postId);
@@ -104,39 +120,6 @@ const postsSlice = createSlice({
       .addCase(createPost.pending, (state) => {
         state.status = 'loading';
       })
-      /*.addCase(createPost.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-
-       // const newPost = action.payload;
-       // state.items.unshift(newPost); // Новые посты в начало
-
-        const postData = action.payload.post || action.payload;
-        const newPost = {
-          id: postData.id,
-          title: postData.title,
-          text: postData.text,
-          subject: postData.subject,
-          author: postData.author,
-          files: postData.files || [],
-          likes: 0,
-          likedBy: []
-        };
-
-        state.items.unshift(newPost);
-        state.userPosts.unshift(newPost);
-
-        //state.items.push(newPost);
-
-          // Обновляем postsBySubject если пост относится к текущему предмету
-        //if (newPost.subject?.id) {
-      //    state.postsBySubject.unshift(newPost);
-       // }
-
-        // Добавляем пост в userPosts, если автор - текущий пользователь
-      //  if (state.userPosts.some(post => post.author?.id === newPost.author?.id)) {
-      //    state.userPosts.unshift(newPost); // Добавляем в начало (новые сверху)
-      //  }
-      })*/
 
       .addCase(createPost.fulfilled, (state, action) => {
         state.status = 'succeeded';
@@ -162,105 +145,55 @@ const postsSlice = createSlice({
         state.error = action.payload;
       })
 
+
       // Обработка fetchUserPosts
       .addCase(fetchUserPosts.pending, (state) => {
         state.status = 'loading';
       })
-      /*.addCase(fetchUserPosts.fulfilled, (state, action) => {
+
+      .addCase(fetchUserPosts.fulfilled, (state, action) => {
         state.status = 'succeeded';
+        
+        console.log('Данные с сервера:', action.payload);
 
-        // Преобразуем данные к единому формату
-        // Проверяем структуру данных и нормализуем
-        const userPosts = action.payload.map(post => {
-          // Если данные вложены в поле post (как в FullPostDTO)
-          const postData = post.post || post;
-          
-          return {
-            id: postData.id,
-            title: postData.title,
-            text: postData.text,
-            subject: postData.subject || post.subject,
-            author: postData.author || post.author,
-            files: postData.files || post.files || [],
-            likes: postData.likes || post.likes || 0,
-            likedBy: postData.likedBy || post.likedBy || []
-          };
-        });
+        console.log('Старые userPosts:', state.userPosts); 
 
-        console.log("Normalized user posts:", action.payload.map(post => ({
-          id: post.id,
-          title: post.title,
-          // ... другие поля
-        })));
-
-        // Сохраняем посты как есть, сортировка будет на уровне компонента
-        state.userPosts = action.payload;
-
-
-
-        console.log("actionpayload = ", action.payload)
-
-        // Обновляем общий список
-        //action.payload.forEach(post => {
-      //    if (!state.items.some(p => p.id === post.id)) {
-       //     state.items.push(post);
-       //   }
-       // });
-
+        // Нормализуем данные с сервера
+        const userPosts = action.payload.map(item => ({
+          post: {
+            id: item.post.id,
+            title: item.post.title,
+            text: item.post.text
+          },
+          subject: item.subject,
+          author: item.author,
+          files: item.files || [],
+          likes: item.post.likes || 0,
+          likedBy: item.likedBy || []
+        }));
+        
+      
+        state.userPosts = userPosts;
+        
         // Обновляем общий список
         userPosts.forEach(post => {
           const existingIndex = state.items.findIndex(p => p.id === post.id);
           if (existingIndex >= 0) {
-            state.items[existingIndex] = post; // Обновляем существующий
+            state.items[existingIndex] = post;
           } else {
-            state.items.push(post); // Добавляем новый
+            state.items.push(post);
           }
         });
-      })*/
 
-        .addCase(fetchUserPosts.fulfilled, (state, action) => {
-          state.status = 'succeeded';
-          
-          console.log('Данные с сервера:', action.payload);
-
-          console.log('Старые userPosts:', state.userPosts); 
-
-          // Нормализуем данные с сервера
-          const userPosts = action.payload.map(item => ({
-            post: {
-              id: item.post.id,
-              title: item.post.title,
-              text: item.post.text
-            },
-            subject: item.subject,
-            author: item.author,
-            files: item.files || [],
-            likes: item.post.likes || 0,
-            likedBy: item.likedBy || []
-          }));
-
-          
-        
-          state.userPosts = userPosts;
-          
-          // Обновляем общий список
-          userPosts.forEach(post => {
-            const existingIndex = state.items.findIndex(p => p.id === post.id);
-            if (existingIndex >= 0) {
-              state.items[existingIndex] = post;
-            } else {
-              state.items.push(post);
-            }
-          });
-
-          console.log('Обновлённые userPosts в Redux:', state.userPosts);
-        })
+        console.log('Обновлённые userPosts в Redux:', state.userPosts);
+      })
 
       .addCase(fetchUserPosts.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })
       
+
       //////////////////////////////////
       // Обработка fetchPostsBySubjectId
       .addCase(fetchPostsBySubjectId.pending, (state) => {

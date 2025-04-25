@@ -17,7 +17,11 @@ const SubjectPage = () => {
   
   const subjects = useSelector(state => state.subjects.list);
   const currentSubject = subjects.find(subj => subj.id === Number(subjectId));
-  const subjectName = currentSubject?.subjectName || 'Неизвестный предмет';
+  const reversedPosts = [...postsBySubject].reverse();
+
+  console.log("reversedPosts = \n",reversedPosts)
+
+  const subjectName = currentSubject?.subjectName || reversedPosts[0]?.subject?.subjectName || 'Неизвестный предмет';
 
   useEffect(() => {
     dispatch(fetchPostsBySubjectId(subjectId));
@@ -28,7 +32,7 @@ const SubjectPage = () => {
   console.log('Subject ID:', subjectId);
   console.log('Status:', status);
 
-  const reversedPosts = [...postsBySubject].reverse();
+  
 
   if (status === 'loading') {
     return <div className="loading">Загрузка...</div>;
