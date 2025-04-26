@@ -61,7 +61,7 @@ public class UserService {
     }
 
     public List<FullPostDTO> getPosts(long id){
-        System.out.println("User ID = " + id);
+        //System.out.println("User ID = " + id);
         List<UserData> users = userRepository.getUserById(id);
         if(users.isEmpty()) {
             throw new RuntimeException("User not found");

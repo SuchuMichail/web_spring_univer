@@ -40,7 +40,7 @@ API.interceptors.response.use(
 /****************************************************************************************** */
 
 // User endpoints
-export const deleteUser = (userId) => API.delete(`/user/${userId}`);
+//export const deleteUser = (userId) => API.delete(`/user/${userId}`);
 
 export const fetchUserPosts = (userId) => API.get(`/api/user/${userId}/getPosts`);
 
@@ -106,7 +106,7 @@ export const fetchPostsBySubjectId = (subjectId) =>
       return response.data;});
 
 
-export const deletePost = (postId) => API.delete(`/post/${postId}`);
+//export const deletePost = (postId) => API.delete(`/post/${postId}`);
 export const downloadFile = (postId, fileId) => fileAPI.get(`/api/post/files/${fileId}`, 
   { responseType: 'blob' }
 );

@@ -21,11 +21,11 @@ const PostPage = () => {
 
 
   useEffect(() => {
-    //if (!post && postId) {
       const loadPost = async () => {
         try {
-          setIsLoading(true);
+          //setIsLoading(true);
           const response = await fetchPostById(postId); 
+          
           const normalizedPost = {
             ...response.post,
             subject: response.subject || {id: null, subjectName: 'Неизвестно'},
@@ -44,10 +44,15 @@ const PostPage = () => {
           setIsLoading(false);
         }
       };
-      if (!post?.files?.length) { // Загружаем, если нет файлов
+      // Загружаем пост если:
+      // 1. Его нет в хранилище ИЛИ
+      // 2. Он есть, но не загружены файлы (проверяем по наличию files в ответе API)
+     // if (!post || (post && post.files && post.files.length === 0 && !post.filesLoaded)) {
         loadPost();
-      }
-      //loadPost();
+     // }
+      //if (!post?.files?.length) { // Загружаем, если нет файлов
+      //  loadPost();
+      //}
    // }
   }, [postId, post, dispatch]);
 

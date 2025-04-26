@@ -30,14 +30,14 @@ public class SubjectController {
     public ResponseEntity<?> deleteSubject(@PathVariable("id") long id){
         subjectService.deleteSubject(id);
 
-        System.out.println("TRY TO DELETE " + id);
+        //System.out.println("TRY TO DELETE " + id);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/getSubjects")
     public ResponseEntity<?> getSubjects() {
-        System.out.println("RETURN GETSUBJECTS\n" + subjectService.getSubjects());
+        //System.out.println("RETURN GETSUBJECTS\n" + subjectService.getSubjects());
         return new ResponseEntity<>(subjectService.getSubjects(), HttpStatus.OK);
     }
 }

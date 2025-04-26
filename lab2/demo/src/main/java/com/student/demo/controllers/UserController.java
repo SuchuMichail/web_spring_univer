@@ -26,9 +26,9 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody AddUserRequest addUserRequest) {
-        System.out.println("ADD USER REQUEST " + addUserRequest);
+        //System.out.println("ADD USER REQUEST " + addUserRequest);
         try {
-            System.out.println("TRY Register");
+            //System.out.println("TRY Register");
             UserDTO response = userService.addUser(addUserRequest);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (LoginExistsException e){

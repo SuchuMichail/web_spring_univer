@@ -110,18 +110,8 @@ const Profile = () => {
           )}
         </div>
         
-        <div className="liked-posts-section">
-          <h2>Понравившиеся публикации ({likedPosts.length})</h2>
-          {likedPosts.length > 0 ? (
-            <div className="posts-list">
-              {likedPosts.map(post => (
-                <Post key={post.post.id} post={post.post} />
-              ))}
-            </div>
-          ) : (
-            <p className="no-posts-message">Вы еще не лайкнули ни одного поста</p>
-          )}
-        </div>
+        
+        
       </div>
     </div>
   );

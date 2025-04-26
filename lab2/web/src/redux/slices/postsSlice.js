@@ -53,30 +53,40 @@ const postsSlice = createSlice({
     status: 'idle',
     error: null,
     userPosts: [], // Отдельное поле для постов пользователя
-    likedBy: []
+    likedBy: [],
+    filesLoaded: false // Добавляем флаг загрузки файлов
   },
   reducers: {
     // Синхронные редьюсеры
-    /*addPost: (state, action) => {
-      const newPost = {
-        id: action.payload.id,
-        title: action.payload.title,
-        text: action.payload.text,
-        subject: action.payload.subject,
-        author: action.payload.author,
-        files: action.payload.files || [],
-        likes: 0,
-        likedBy: []
-      };
-      state.items.push(newPost);
-    },*/
+
     addPost: (state, action) => {
       const postData = action.payload.post || action.payload;
       const existingIndex = state.items.findIndex(p => p.id === postData.id);
 
-      console.log("postData = \n",postData)
+      console.log("action.payload ",action.payload)
+      console.log("AAA postData = \n",postData)
       console.log("existingIndex = ",existingIndex)
+      console.log("state.items ",state.items)
+      
+      const newPost = {
+        id: postData.id,
+        title: postData.title,
+        text: postData.text,
+        subject: action.payload.subject,
+        author: action.payload.author,
+        files: action.payload.files || [],
+        likedBy: action.payload.likedBy || [],
+        filesLoaded: action.payload.files ? true : false // Отмечаем, загружены ли файлы
+      };
 
+      console.log("ARARA newPost = ",newPost)
+
+      if (existingIndex >= 0) {
+        state.items[existingIndex] = newPost;
+      } else {
+        state.items.unshift(newPost);
+      }
+/*
       if (existingIndex >= 0) {
         // Обновляем существующий пост
         //console.log("old state.items[existingIndex] = \n",state.items[existingIndex])
@@ -98,7 +108,7 @@ const postsSlice = createSlice({
           likedBy: []
         };
         state.items.unshift(newPost);
-      }
+      }*/
     },
     toggleLike: (state, action) => {
       const post = state.items.find(p => p.id === action.payload.postId);

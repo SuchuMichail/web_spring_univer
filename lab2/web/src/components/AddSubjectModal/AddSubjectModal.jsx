@@ -17,11 +17,6 @@ const AddSubjectModal = ({ onClose }) => {
       return;
     }
 
-    /*if (subjectName.trim()) {
-      dispatch(addSubject(subjectName));
-      onClose();
-    }*/
-
     if(!subjectName.trim()) return;
 
     try {
