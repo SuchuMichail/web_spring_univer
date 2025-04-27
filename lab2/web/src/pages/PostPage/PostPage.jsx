@@ -8,9 +8,12 @@ import './PostPage.css';
 const PostPage = () => {
   const { postId } = useParams();
   const dispatch = useDispatch();
-  const { user } = useSelector(state => state.auth);
+  const { user } = useSelector(state => {
+    //console.log("Current state:", JSON.stringify(state, null, 2));
+    return state.auth;});
+
   const post = useSelector(state => 
-    state.posts.items.find(p => String(p.id) === String(postId))
+    state.posts.items.find(p => String(p.post.id) === String(postId))
   );
 
   console.log("POST = \n",post)
@@ -125,19 +128,19 @@ const PostPage = () => {
   console.log("post = \n",post)
 
   return (
-    <div className="post-page">
-      <div className="post-header">
-        <span className="post-subject">{post.subject.subjectName}</span>
-        <h1>{post.title}</h1>
-        <p className="post-author">Автор: {post.author?.username || 'Неизвестен'}</p>
+    <div className="post-page_page">
+      <div className="post-page_header">
+        <span className="post-page_subject">{post.subject.subjectName}</span>
+        <h1>{post.post.title}</h1>
+        <p className="post-page_author">Автор: {post.author?.username || 'Неизвестен'}</p>
       </div>
 
-      <div className="post-content">
-        <p>{post.text}</p>
+      <div className="post-page_content">
+        <p>{post.post.text}</p>
       </div>
       
       {Array.isArray(post.files) && post.files.length > 0 && (
-        <div className="post-files">
+        <div className="post-page_files">
           <h3>Прикрепленные файлы:</h3>
           {error && <div className="error-message">{error}</div>}
           <ul className="files-list">
@@ -169,7 +172,7 @@ const PostPage = () => {
         </div>
       )}
 
-      <div className="post-actions">
+      <div className="post-page_actions">
         <button 
           onClick={handleLike}
           className={`like-btn ${isLiked ? 'liked' : ''}`}

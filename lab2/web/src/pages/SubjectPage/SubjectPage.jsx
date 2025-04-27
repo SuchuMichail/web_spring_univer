@@ -54,7 +54,7 @@ const SubjectPage = () => {
           {Array.isArray(reversedPosts) && reversedPosts.length > 0 ? (
             reversedPosts.map(post => (
               <div key={post.post.id} className="post-wrapper">
-                <Post post={post.post} />
+                <Post post={post} />
               </div>
             ))
           ) : (

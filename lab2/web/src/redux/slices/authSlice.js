@@ -23,10 +23,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      console.log("SDFBSFBSFBSFGBFGNFDNDFNDGNGHDNGHD")
       const responseData  = await loginUser(credentials);
-      //const userData = response.data?.userData; 
-      console.log("IMINSLICEEEEEEEEEEE\nresponseData : ", responseData)
       
       if (!responseData) {
         return rejectWithValue('Неверный логин или пароль');

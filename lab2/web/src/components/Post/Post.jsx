@@ -7,28 +7,48 @@ import './Post.css';
 const Post = ({ post }) => {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
+
   const isLiked = user && post.likedBy && post.likedBy.includes(user.id || user.name);
 
   const handleLike = (e) => {
     e.preventDefault();
     if (user) {
       dispatch(toggleLike({
-        postId: post.id,
+        postId: post.post.id,
         userId: user.id
       }));
     }
   };
 
-  /*console.log('Post data:', post);
+  // Получаем первые 30 символов текста поста
+  const previewText = post.post.text ? 
+    post.post.text.length > 30 ? 
+      `${post.post.text.substring(0, 30)}...` : 
+      post.post.text : 
+    '';
+
+  console.log('Post data FROM Redux:', post);
 console.log('LikedBy:', post.likedBy);
-console.log('User:', user);*/
+console.log('post.post.id ', post.post.id);
 
   return (
-    <Link to={`/post/${post.id}`} className="post-card">
+    <Link to={`/post/${post.post.id}`} className="post-card">
       <div className="post-content">
-        <h3 className="post-title">{post.title}</h3>
+        {/* Верхняя часть - автор */}
+        <div className="post-author">
+          {post.author?.username || 'Неизвестный автор'}
+        </div>
+
+        {/* Основной контент - заголовок (1/3 высоты) */}
+        <h3 className="post-title">{post.post.title}</h3>
+
+        {/* Нижняя часть - превью текста */}
+        <div className="post-preview">
+          {previewText}
+        </div>
+
+        {/* Футер - лайки */}
         <div className="post-footer">
-          <span className="post-author">{post.author}</span>
           <button 
             onClick={handleLike}
             className={`like-btn ${isLiked ? 'liked' : ''}`}

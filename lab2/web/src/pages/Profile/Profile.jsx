@@ -102,7 +102,7 @@ const Profile = () => {
           {sortedUserPosts.length > 0 ? (
             <div className="posts-list">
               {sortedUserPosts.map(post => (
-                <Post key={post.post.id} post={post.post} />
+                <Post key={post.post.id} post={post} />
               ))}
             </div>
           ) : (

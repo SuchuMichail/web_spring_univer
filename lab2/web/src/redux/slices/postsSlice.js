@@ -69,9 +69,11 @@ const postsSlice = createSlice({
       console.log("state.items ",state.items)
       
       const newPost = {
-        id: postData.id,
-        title: postData.title,
-        text: postData.text,
+        post: {
+          id: postData.id,
+          title: postData.title,
+          text: postData.text,
+        },
         subject: action.payload.subject,
         author: action.payload.author,
         files: action.payload.files || [],
@@ -86,29 +88,6 @@ const postsSlice = createSlice({
       } else {
         state.items.unshift(newPost);
       }
-/*
-      if (existingIndex >= 0) {
-        // Обновляем существующий пост
-        //console.log("old state.items[existingIndex] = \n",state.items[existingIndex])
-        state.items[existingIndex] = {
-          ...state.items[existingIndex],
-          ...postData,
-          files: postData.files || state.items[existingIndex].files,
-          likedBy: postData.likedBy || state.items[existingIndex].likedBy
-        };
-      } else {
-        const newPost = {
-          id: postData.id,
-          title: postData.title,
-          text: postData.text,
-          subject: action.payload.subject,
-          author: action.payload.author,
-          files: action.payload.files || [],
-          likes: 0,
-          likedBy: []
-        };
-        state.items.unshift(newPost);
-      }*/
     },
     toggleLike: (state, action) => {
       const post = state.items.find(p => p.id === action.payload.postId);
@@ -136,9 +115,11 @@ const postsSlice = createSlice({
         
         const responseData = action.payload;
         const newPost = {
-          id: responseData.post.id,
-          title: responseData.post.title,
-          text: responseData.post.text,
+          post: {
+            id: responseData.post.id,
+            title: responseData.post.title,
+            text: responseData.post.text,
+          },
           subject: responseData.subject,
           author: responseData.author,
           files: responseData.files || [],
@@ -173,15 +154,14 @@ const postsSlice = createSlice({
           post: {
             id: item.post.id,
             title: item.post.title,
-            text: item.post.text
+            text: item.post.text,
           },
           subject: item.subject,
           author: item.author,
           files: item.files || [],
           likes: item.post.likes || 0,
           likedBy: item.likedBy || []
-        }));
-        
+        }));        
       
         state.userPosts = userPosts;
         
@@ -212,7 +192,22 @@ const postsSlice = createSlice({
       .addCase(fetchPostsBySubjectId.fulfilled, (state, action) => {
         state.status = 'succeeded';
         console.log("ACTION PAYLOAD\n",action.payload)
-        state.postsBySubject = action.payload || [];
+
+        // Нормализуем данные с сервера
+        const normalizedPosts  = action.payload.map(item => ({
+          post: {
+            id: item.post.id,
+            title: item.post.title,
+            text: item.post.text,
+          },
+          subject: item.subject,
+          author: item.author,
+          files: item.files || [],
+          likes: item.post.likes || 0,
+          likedBy: item.likedBy || []
+        }));
+
+        state.postsBySubject = normalizedPosts  || [];
         console.log('Posts loaded:', action.payload);
       })
       .addCase(fetchPostsBySubjectId.rejected, (state, action) => {
