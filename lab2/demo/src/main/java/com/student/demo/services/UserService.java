@@ -72,6 +72,9 @@ public class UserService {
             result.add(new FullPostDTO(postData));
         }
         return result;
+    }
 
+    public UserWithPostsDTO loadUserByUsername(String login){
+        return new UserWithPostsDTO(userRepository.loadUserByLogin(login).get(0));
     }
 }

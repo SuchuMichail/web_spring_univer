@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -22,11 +23,13 @@ public class SubjectController {
     }
 
     @PostMapping("/addSubject")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addSubject(@Valid @RequestBody AddSubjectRequest addSubjectRequest) throws IOException {
         return new ResponseEntity<>(subjectService.addSubject(addSubjectRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteSubject/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteSubject(@PathVariable("id") long id){
         subjectService.deleteSubject(id);
 

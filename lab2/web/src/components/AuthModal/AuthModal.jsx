@@ -52,6 +52,8 @@ const AuthModal = ({ onClose }) => {
           university: formData.university,
           userGroup: formData.userGroup
         }));
+        
+        setIsLogin(true); // Переключаем на форму входа после регистрации
       }
     } catch (err) {
       console.error('Ошибка:', err);

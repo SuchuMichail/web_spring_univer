@@ -56,14 +56,16 @@ public class PostController {
         return new ResponseEntity<>(postService.addPost(request), HttpStatus.OK);
     }
 
+    /*
     @DeleteMapping("/deletePost")
     public ResponseEntity<?> deletePost(@Valid @RequestBody DeletePostRequest deletePostRequest){
         postService.deletePost(deletePostRequest);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+*/
 
-    @GetMapping("/{id}")
+    @GetMapping("/fetchPostById/{id}")
     public ResponseEntity<?> fetchPostById(@PathVariable("id") long id){
        // System.out.println("RESULT FIND POST = \n" + postService.fetchPostById(id));
         return new ResponseEntity<>(postService.fetchPostById(id), HttpStatus.OK);

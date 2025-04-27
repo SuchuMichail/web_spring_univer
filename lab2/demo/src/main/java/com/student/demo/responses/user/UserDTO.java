@@ -2,11 +2,15 @@ package com.student.demo.responses.user;
 
 import com.student.demo.entities.UserData;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.beans.ConstructorProperties;
+import java.util.Collection;
+import java.util.Collections;
 
 @Data
-public class UserDTO {
+public class UserDTO implements UserDetails {
     private Long id;
     private String login;
     private String password;
@@ -34,5 +38,10 @@ public class UserDTO {
         this.university = userData.getUniversity();
         this.userGroup = userData.getUserGroup();
         this.isAdmin = userData.isAdmin();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
     }
 }

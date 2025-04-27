@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { logout } from '../redux/slices/authSlice';
+import { store } from '../redux/store';
 
 const API = axios.create({
   baseURL: 'http://localhost:8080',
@@ -16,6 +18,14 @@ const fileAPI = axios.create({
   }
 });
 
+const authAPI = axios.create({
+  baseURL: 'http://localhost:8080',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
 // Добавьте обработку CORS ошибок
 API.interceptors.response.use(
   response => {
@@ -25,6 +35,11 @@ API.interceptors.response.use(
   error => {
     if (error.message === 'Network Error' && !error.response) {
       error.message = 'Проблемы с соединением или CORS';
+    }
+
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      localStorage.removeItem('authToken');
+      window.location.href = '/?authError=session_expired';
     }
 
     console.error('Ошибка запроса:', {
@@ -37,12 +52,25 @@ API.interceptors.response.use(
   }
 );
 
+
+//Добавление токена в заголовки запросов:
+authAPI.interceptors.request.use(config => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  }, error => {
+  return Promise.reject(error);
+});
+
+
 /****************************************************************************************** */
 
 // User endpoints
 //export const deleteUser = (userId) => API.delete(`/user/${userId}`);
 
-export const fetchUserPosts = (userId) => API.get(`/api/user/${userId}/getPosts`);
+export const fetchUserPosts = (userId) => authAPI.get(`/api/user/${userId}/getPosts`);
 
 export const loginUser = (credentials) => 
   API.post('/api/user/login', credentials)
@@ -93,7 +121,7 @@ export const registerUser = async (userData) => {
 export const addPost = (formData) => fileAPI.post('/api/post/addPost', formData);
 
 
-export const fetchPostById = (postId) => API.get(`/api/post/${postId}`)
+export const fetchPostById = (postId) => API.get(`/api/post/fetchPostById/${postId}`)
     .then(response => {
       console.log("(fetchPostById) Post data with files:", response.data);
       return response.data;
@@ -116,7 +144,7 @@ export const downloadFile = (postId, fileId) => fileAPI.get(`/api/post/files/${f
 
 // Subject endpoints
 export const addSubject = (subjectName) => 
-  API.post('/api/subject/addSubject', {subjectName})                                
+  authAPI.post('/api/subject/addSubject', {subjectName})                                
       .then(response => {
         const data = response.data.subject; // Извлекаем subjectData;
         console.log('data: ', data);
@@ -145,7 +173,7 @@ export const deleteSubject = (subjectId) => {
     console.error('Попытка удаления без ID');
     return Promise.reject(new Error('ID предмета не указан'));
   }
-  return API.delete(`/api/subject/deleteSubject/${subjectId}`);
+  return authAPI.delete(`/api/subject/deleteSubject/${subjectId}`);
 };
 
 

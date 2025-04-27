@@ -3,15 +3,20 @@ package com.student.demo.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Data
 @Entity
 @Table(name = "UserData")
 @NoArgsConstructor
-public class UserData {
+public class UserData implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -81,5 +86,13 @@ public class UserData {
         this.userPosts = userPosts;
         this.likedPosts = likedPosts;
         this.isAdmin = false;
+    }
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return isAdmin ?
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) :
+                Collections.emptyList();
     }
 }

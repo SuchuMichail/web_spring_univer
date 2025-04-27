@@ -24,23 +24,24 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const responseData  = await loginUser(credentials);
+      const userData = responseData.user;
       
       if (!responseData) {
         return rejectWithValue('Неверный логин или пароль');
       }
       return {
         user: {
-          id: responseData.user.id,
-          login: responseData.user.login,
-          password: responseData.user.password,
-          username: responseData.user.username,
-          university: responseData.user.university,
-          userGroup: responseData.user.userGroup, // Используем userGroup
-          isAdmin: responseData.user.admin, // Используем поле isAdmin из UserData
-          likedPosts: responseData.likedPosts || [], // Добавляем likedPosts
-          userPosts: responseData.userPosts || [] // Добавляем userPosts
+          id: userData.user.id,
+          login: userData.user.login,
+          password: userData.user.password,
+          username: userData.user.username,
+          university: userData.user.university,
+          userGroup: userData.user.userGroup, // Используем userGroup
+          isAdmin: userData.user.isAdmin, // Используем поле isAdmin из UserData
+          likedPosts: userData.likedPosts || [], // Добавляем likedPosts
+          userPosts: userData.userPosts || [] // Добавляем userPosts
         },
-        isAdmin: responseData.user.admin // Дублируем для удобства
+        isAdmin: userData.user.isAdmin // Дублируем для удобства
       };
     } catch (error) {
       return rejectWithValue(error.message);
@@ -55,18 +56,26 @@ const authSlice = createSlice({
     user: null,
     isAdmin: false,
     status: 'idle',
+    token: null,
     error: null
   },
   reducers: {
     logout(state) {
+      localStorage.removeItem('authToken');
       state.user = null;
       state.isAdmin = false;
+      state.token = null;
       state.error = null;
     },
     addUserPost: (state, action) => {
       if (state.user) {
         state.user.userPosts = [action.payload, ...state.user.userPosts];
       }
+    },
+    setCredentials: (state, action) => {
+      state.token = action.payload.token;
+      state.user = action.payload.user;
+      state.isAdmin = action.payload.isAdmin;
     }
   },
   extraReducers: (builder) => {
@@ -79,18 +88,16 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
+        const { token, user } = action.payload;
+        console.log("action.payload = ",action.payload)
+
+        console.log("minimini user = ",user)
+
+        localStorage.setItem('authToken', token);
         state.status = 'succeeded';
-        /*state.user = {
-          id: action.payload.id,
-          login: action.payload.login, 
-          password: action.payload.password,
-          username: action.payload.username, 
-          university: action.payload.university,
-          group: action.payload.userGroup,
-          isAdmin: action.payload.isAdmin
-        };*/
-        state.user = action.payload.user; // Используем payload напрямую
-        state.isAdmin = action.payload.isAdmin;
+        state.user = user; 
+        state.isAdmin = user.isAdmin;
+        state.token = token;
         state.error = null; // Очищаем ошибки при успешном входе
       })
       .addCase(login.rejected, (state, action) => {
