@@ -3,11 +3,13 @@ package com.student.demo.responses.user;
 import com.student.demo.entities.UserData;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.beans.ConstructorProperties;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Data
 public class UserDTO implements UserDetails {
@@ -42,6 +44,8 @@ public class UserDTO implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return isAdmin ?
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) :
+                Collections.emptyList();
     }
 }

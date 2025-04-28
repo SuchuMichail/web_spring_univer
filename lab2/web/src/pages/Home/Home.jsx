@@ -12,7 +12,10 @@ const Home = () => {
   const [subjectToDelete, setSubjectToDelete] = useState(null);
   
   const dispatch = useDispatch();
-  const { isAdmin } = useSelector(state => state.auth);
+  const { isAdmin } = useSelector(state => {
+    console.log("state = ",state)
+    console.log("state.auth = ",state.auth)
+    return state.auth;});
   const subjects = useSelector(state => state.subjects.list);
   const status = useSelector(state => state.subjects.status);
 
@@ -53,6 +56,7 @@ const Home = () => {
   
   useEffect(() => {
     console.log('Current subjects:', subjects);
+    console.log("isAdmin = ", isAdmin)
   }, [subjects]);
   
   return (

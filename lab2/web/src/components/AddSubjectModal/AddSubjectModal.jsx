@@ -33,8 +33,8 @@ const AddSubjectModal = ({ onClose }) => {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
+    <div className="sub_modal-overlay">
+      <div className="sub_modal-content">
         <h2>Добавить предмет</h2>
         {status === 'failed' && <div className="error">{error}</div>}
         
@@ -47,7 +47,7 @@ const AddSubjectModal = ({ onClose }) => {
             required
           />
           
-          <div className="modal-actions">
+          <div className="sub_modal-actions">
             <button type="button" onClick={onClose}>Отмена</button>
             <button type="submit" disabled={status === 'loading'}>
               {status === 'loading' ? 'Добавление...' : 'Добавить'}

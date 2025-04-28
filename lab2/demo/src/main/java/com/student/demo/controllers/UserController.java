@@ -33,25 +33,21 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody AddUserRequest addUserRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody AddUserRequest request) {
         //System.out.println("ADD USER REQUEST " + addUserRequest);
         try {
             //System.out.println("TRY Register");
-            UserDTO response = userService.addUser(addUserRequest);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            UserWithPostsDTO dto = new UserWithPostsDTO(userService.addUser(request));
+
+            String token = jwtTokenUtils.generateToken(dto);
+
+            return ResponseEntity.ok(Map.of("token", token,
+                    "user", dto));
         } catch (LoginExistsException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-/*
-    @DeleteMapping("/deleteUser")
-    public ResponseEntity<?> deleteUser(@Valid @RequestBody DeleteUserRequest deleteUserRequest){
-        userService.deleteUser(deleteUserRequest);
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-*/
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginPasswordRequest request){
@@ -74,7 +70,18 @@ public class UserController {
     @GetMapping("{userId}/getPosts")
     public ResponseEntity<?> getPosts(@PathVariable("userId") long id){
        // System.out.println("I RETURN THAT POSTS\n" + userService.getPosts(id));
-        System.out.println("Запрос постов для пользователя: " + id);
+      //  System.out.println("Запрос постов для пользователя: " + id);
         return new ResponseEntity<>(userService.getPosts(id), HttpStatus.OK);
     }
+
+
+
+/*
+    @DeleteMapping("/deleteUser")
+    public ResponseEntity<?> deleteUser(@Valid @RequestBody DeleteUserRequest deleteUserRequest){
+        userService.deleteUser(deleteUserRequest);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+*/
 }

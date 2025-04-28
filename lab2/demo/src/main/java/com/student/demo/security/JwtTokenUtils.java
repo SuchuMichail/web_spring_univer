@@ -2,6 +2,7 @@ package com.student.demo.security;
 
 import com.student.demo.entities.UserData;
 import com.student.demo.responses.user.UserDTO;
+import com.student.demo.responses.user.UserWithPostsDTO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -28,6 +29,17 @@ public class JwtTokenUtils {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         //claims.put("isAdmin", ((UserDTO) userDetails).isAdmin()); // Добавляем кастомные поля
+     //   System.out.println("YA TUT");
+      //  System.out.println(userDetails);
+
+        if (userDetails instanceof UserWithPostsDTO) {
+            claims.put("isAdmin", ((UserWithPostsDTO) userDetails).isAdmin());
+          //  System.out.println("AAAAAAAAAHHHHHH");
+        } else if (userDetails instanceof UserData) {
+            claims.put("isAdmin", ((UserData) userDetails).isAdmin());
+           // System.out.println("HHHHHHAAAAAAAAA");
+        }
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())

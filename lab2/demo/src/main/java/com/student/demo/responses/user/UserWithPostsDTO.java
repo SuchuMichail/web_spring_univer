@@ -5,6 +5,7 @@ import com.student.demo.entities.UserData;
 import com.student.demo.responses.post.PostDTO;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.beans.ConstructorProperties;
@@ -38,9 +39,19 @@ public class UserWithPostsDTO implements UserDetails  {
         }
     }
 
+    public UserWithPostsDTO(UserDTO userDTO){
+        this.user = userDTO;
+    }
+
+    public boolean isAdmin(){
+        return this.user.isAdmin();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return this.user.isAdmin() ?
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN")) :
+                Collections.emptyList();
     }
 
     @Override

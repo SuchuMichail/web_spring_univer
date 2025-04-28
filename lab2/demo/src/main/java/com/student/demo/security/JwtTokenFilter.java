@@ -33,7 +33,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         if (token != null && jwtTokenUtils.validateToken(token)) {
             Claims claims = jwtTokenUtils.getAllClaimsFromToken(token);
             String username = jwtTokenUtils.getUsername(token);
-            boolean isAdmin = claims.get("isAdmin", Boolean.class);
+            Boolean isAdmin = claims.get("isAdmin", Boolean.class);
+
+            if (isAdmin == null) {
+                isAdmin = false; // или обработать как ошибку аутентификации
+            }
 
             // Создаем список authorities на основе isAdmin
             List<GrantedAuthority> authorities = new ArrayList<>();

@@ -13,6 +13,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -31,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/post/files/**").permitAll()
 
                         .requestMatchers("/api/user/register", "/api/user/login").permitAll()
+                        .requestMatchers(antMatcher("/api/user/**/getPosts")).authenticated()
                         .requestMatchers("/api/subject/addSubject", "/api/subject/deleteSubject/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

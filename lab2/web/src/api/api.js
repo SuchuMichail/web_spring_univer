@@ -56,9 +56,16 @@ API.interceptors.response.use(
 //Добавление токена в заголовки запросов:
 authAPI.interceptors.request.use(config => {
     const token = localStorage.getItem('authToken');
+
+    console.log("localStorage... ", localStorage)
+    console.log("MY Token = ",token)
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    console.log('Заголовки запроса:', config.headers);
+
     return config;
   }, error => {
   return Promise.reject(error);
@@ -70,7 +77,12 @@ authAPI.interceptors.request.use(config => {
 // User endpoints
 //export const deleteUser = (userId) => API.delete(`/user/${userId}`);
 
-export const fetchUserPosts = (userId) => authAPI.get(`/api/user/${userId}/getPosts`);
+export const fetchUserPosts = (userId) => 
+  authAPI.get(`/api/user/${userId}/getPosts`)
+          .then(response => {
+            console.log("fetchUserPosts response = ", response);
+            return response;
+          });
 
 export const loginUser = (credentials) => 
   API.post('/api/user/login', credentials)
