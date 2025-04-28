@@ -14,7 +14,7 @@ const fileAPI = axios.create({
   baseURL: 'http://localhost:8080',
   withCredentials: true, 
   headers: {
-    'Content-Type': 'multipart/form-data',
+    'Content-Type': 'multipart/form-data'
   }
 });
 
@@ -69,6 +69,23 @@ authAPI.interceptors.request.use(config => {
     return config;
   }, error => {
   return Promise.reject(error);
+});
+
+fileAPI.interceptors.request.use(config => {
+  const token = localStorage.getItem('authToken');
+
+  console.log("localStorage... ", localStorage)
+  console.log("MY Token = ",token)
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  console.log('Заголовки запроса:', config.headers);
+
+  return config;
+}, error => {
+return Promise.reject(error);
 });
 
 

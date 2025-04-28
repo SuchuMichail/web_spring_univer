@@ -34,6 +34,8 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/user/register", "/api/user/login").permitAll()
                         .requestMatchers(antMatcher("/api/user/**/getPosts")).authenticated()
+                        .requestMatchers("/api/post/addPost").authenticated()
+
                         .requestMatchers("/api/subject/addSubject", "/api/subject/deleteSubject/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
