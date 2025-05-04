@@ -48,7 +48,7 @@ console.log('post.post.id ', post.post.id);
         </div>
 
         {/* Футер - лайки */}
-        <div className="post-footer">
+      {/*  <div className="post-footer">
           <button 
             onClick={handleLike}
             className={`like-btn ${isLiked ? 'liked' : ''}`}
@@ -56,7 +56,7 @@ console.log('post.post.id ', post.post.id);
           >
             {isLiked ? '♥' : '♡'} {post.likes}
           </button>
-        </div>
+        </div>*/}
       </div>
     </Link>
   );

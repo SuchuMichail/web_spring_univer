@@ -173,13 +173,13 @@ const PostPage = () => {
       )}
 
       <div className="post-page_actions">
-        <button 
+        {/*<button 
           onClick={handleLike}
           className={`like-btn ${isLiked ? 'liked' : ''}`}
           disabled={!user}
         >
           {isLiked ? '♥' : '♡'} {post.likes}
-        </button>
+        </button>*/}
         <Link to={post.subject?.id ? `/subject/${post.subject.id}` : '#'} className="btn btn-outline">
           К предмету
         </Link>
